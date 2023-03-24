@@ -1,3 +1,4 @@
+'''
 import pandas as pd
 import numpy as np
 import random
@@ -23,6 +24,11 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
 from calendar import monthrange
 from datetime import date, timedelta  # datetime
+'''
+
+import kivy
+from kivy.app import App
+from kivy.uix.screenmanager import Screen, ScreenManager
 
 
 class WindowManager(ScreenManager):
