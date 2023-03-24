@@ -34,13 +34,13 @@ WindowManager:
                 Label:
                     text: '   Find\nYourself'
                     color: (50/255, 50/255, 50/255, 1) if root.ids.main_btn.state == 'normal' else (10/255, 10/255, 10/255, 1)
-                    #font_name: 'fonts/vintage.ttf'
+                    font_name: 'fonts/vintage.ttf'
                     font_size: (self.height + self.width)/25 if root.ids.main_btn.state == 'normal' else (self.height + self.width)/24
 
 
                 Label:
                     text: 'Click here'
-                    #font_name: 'fonts/vintage1'
+                    font_name: 'fonts/vintage1'
                     font_size: dp((self.height + self.width)/45)
                     color: (200/255, 200/255, 200/255, 0.3) if root.ids.main_btn.state == 'normal' else (0,0,0,0)
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
