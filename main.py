@@ -27,9 +27,12 @@ from datetime import date, timedelta  # datetime
 '''
 
 import kivy
+from kivy import Config
 from kivy.app import App
 from kivy.uix.screenmanager import Screen, ScreenManager
 
+Config.set('graphics', 'width', '450')
+Config.set('graphics', 'height', '1000')
 
 class WindowManager(ScreenManager):
     pass

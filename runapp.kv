@@ -28,19 +28,19 @@ WindowManager:
                     on_release:
                         app.root.current = 'qna'
                         root.manager.transition.direction = 'left'
-
-
-
+                Image:
+                    source: 'images/color_stain.png'
+                    color: (1,1,1,0.5) if root.ids.main_btn.state == 'normal' else (1,1,1,1)
+                    size_hint: (0.6, 0.6) if root.ids.main_btn.state == 'normal' else (0.65, 0.65)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                 Label:
                     text: '   Find\nYourself'
                     color: (50/255, 50/255, 50/255, 1) if root.ids.main_btn.state == 'normal' else (10/255, 10/255, 10/255, 1)
-                    #font_name: 'fonts/vintage.ttf'
+                    font_name: 'fonts/vintage.ttf'
                     font_size: (self.height + self.width)/25 if root.ids.main_btn.state == 'normal' else (self.height + self.width)/24
-
-
                 Label:
                     text: 'Click here'
-                    #font_name: 'fonts/vintage1'
+                    font_name: 'fonts/vintage1'
                     font_size: dp((self.height + self.width)/45)
                     color: (200/255, 200/255, 200/255, 0.3) if root.ids.main_btn.state == 'normal' else (0,0,0,0)
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
@@ -50,17 +50,16 @@ WindowManager:
             pos_hint: {'center_x': .5, }
             padding: '10dp'
             spacing: '10dp'
-
             OptionButton:
                 text: 'History'
+                font_name: 'fonts/vintage2.otf'
                 font_size: '50dp'
                 on_release:
                     app.root.current = 'history'
                     root.manager.transition.direction = 'left'
-
             OptionButton:
                 text: 'Setting'
-                #font_name: 'fonts/vintage2.otf'
+                font_name: 'fonts/vintage2.otf'
                 font_size: '50dp'
                 on_release:
                     app.root.current = 'setting'
@@ -74,12 +73,14 @@ WindowManager:
             source: 'images/sunset.jpg'
             allow_stretch: True
             keep_ratio: False
+            color: (1,1,1,0.5)
 
         Label:
             text: "Your mood today:"
-            #font_name: 'fonts/vintage1'
+            font_name: 'fonts/vintage1'
             font_size: dp(25)
             pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+
         Slider:
             id: mood_slider
             min: 0
@@ -92,28 +93,28 @@ WindowManager:
         QuestionChatBox:
             id: question
             padding: (10, 0)
-
             pos_hint: {'x': 0.05, 'center_y': 0.9}
             #font_name: 'fonts/korean1.ttf'
-            text: 'Question'
+            text: 'Question Question Question Question Question Question'
             text_size: self.size
             halign: 'left'
             valign: 'middle'
             font_size: dp(17)
-            size_hint: (0.75, 0.08) #if root.width < root.height else (0.3, 0.08)
+            size_hint: (0.75, 0.08)
             color: (0, 0, 0)
+
         AnswerChatBox:
             id:answer
             padding: (10, 0)
             #pos_hint: {'center_x': 0.55, 'center_y': 0.75}
             pos_hint: {'right': 0.95, 'center_y': 0.7}
-            text: 'Answer'
+            text: 'Answer Answer Answer'
             text_size: self.size
             #font_name: 'fonts/korean1.ttf'
             halign: 'left'
             valign: 'middle'
             font_size: dp(17)
-            size_hint: (0,0) #if root.answer == '' else (0.75, 0.05) if root.width < root.height else (0.3, 0.05)
+            size_hint: (0.75, 0.05) #if root.answer == '' else (0.75, 0.05) if root.width < root.height else (0.3, 0.05)
             color: (0, 0, 0)
         TypeBox:
             id: typebox
@@ -145,16 +146,16 @@ WindowManager:
 
     RelativeLayout:
         Image:
-            source: 'images/green.jpg'
+            source: 'images/pink.jpg'
             allow_stretch: True
             keep_ratio: False
-
+            color: (1,1,1,0.5)
         BoxLayout:
             orientation: 'vertical'
             TopBar:
                 Label:
                     text: 'March 2023'
-                    #font_name: 'fonts/kosan'
+                    font_name: 'fonts/kosan'
                     color: (0,0,0)
                     bold: True
                     pos_hint: {'center_y': 0.5}
@@ -177,6 +178,10 @@ WindowManager:
     name: 'setting'
 
     RelativeLayout:
+        Image:
+            source: 'images/blue.jpg'
+            allow_stretch: True
+            keep_ratio: False
 
         Label:
             text: 'Setting'
@@ -292,35 +297,6 @@ WindowManager:
             pos: self.pos
             radius: [20]
 
-    BoxLayout:
-        padding: ['5dp', 0, '5dp',0]
-        spacing: dp(7)
-        Label:
-            id: date
-            size_hint: (0.2 , 1)
-            #text: 'root.date'
-            canvas.before:
-                Color:
-                    rgba: (0.3, 0.3, 0.3, 1)
-                Line:
-                    points: (self.size[0], 0 + 10, self.size[0], self.size[1] - 10)
-                    width: 2
-
-        Label:
-            id: question
-            text: 'question question question question question question'
-            text_size: self.size
-            halign: 'left'
-            valign: 'middle'
-            #canvas.before:
-            #    Color:
-            #        rgba: (200/255, 2/255, 2/255, 0.4)
-            #    RoundedRectangle:
-            #        size: self.size
-            #        pos: self.pos
-            #        radius: [20]
-
-
 
 <AnswerWriteBox@Popup>:
     background_color: (0,0,0,0)
@@ -344,7 +320,7 @@ WindowManager:
                 RoundedRectangle:
                     size: self.size
                     pos: self.pos
-                    radius: [0,0,10,10]
+                    radius: [0, 0, 20, 20]
                 Color:
                     rgba: (1, 1, 1, 1)
         Button:
@@ -353,4 +329,6 @@ WindowManager:
             pos_hint: {'right': 1, 'bottom': 0}
             text: 'Answer'
             font_size: dp(15)
+            on_release:
+                root.dismiss()
 
