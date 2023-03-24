@@ -1,0 +1,346 @@
+#:import Factory kivy.factory.Factory
+WindowManager:
+    MainWindow:
+    QnAWindow:
+    HistoryWindow:
+    SettingWindow:
+#QnAWindow:
+
+
+<MainWindow>:
+    name: 'main'
+
+    RelativeLayout:
+        RelativeLayout:
+            
+
+            RelativeLayout:
+                pos_hint: {'center_y': 0.6}
+                Button:
+                    id: main_btn
+                    background_color: (0,0,0,0)
+                    background_normal: ''
+                    size_hint: (0.55, 0.2) if root.width < root.height else (0.5, 0.5) if root.width/root.height < 1.75 else (0.3, 0.5)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    on_release:
+                        app.root.current = 'qna'
+                        root.manager.transition.direction = 'left'
+
+                
+
+                Label:
+                    text: '   Find\nYourself'
+                    color: (50/255, 50/255, 50/255, 1) if root.ids.main_btn.state == 'normal' else (10/255, 10/255, 10/255, 1)
+                    #font_name: 'fonts/vintage.ttf'
+                    font_size: (self.height + self.width)/25 if root.ids.main_btn.state == 'normal' else (self.height + self.width)/24
+                    
+
+                Label:
+                    text: 'Click here'
+                    #font_name: 'fonts/vintage1'
+                    font_size: dp((self.height + self.width)/45)
+                    color: (200/255, 200/255, 200/255, 0.3) if root.ids.main_btn.state == 'normal' else (0,0,0,0)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+        BoxLayout:
+            size_hint: (1, 0.075)
+            pos_hint: {'center_x': .5, }
+            padding: '10dp'
+            spacing: '10dp'
+
+            OptionButton:
+                text: 'History'
+                font_size: '50dp'
+                on_release:
+                    app.root.current = 'history'
+                    root.manager.transition.direction = 'left'
+
+            OptionButton:
+                text: 'Setting'
+                #font_name: 'fonts/vintage2.otf'
+                font_size: '50dp'
+                on_release:
+                    app.root.current = 'setting'
+                    root.manager.transition.direction = 'left'
+
+<QnAWindow>:
+    name: 'qna'
+
+    RelativeLayout:
+        
+        Label:
+            text: "Your mood today:"
+            #font_name: 'fonts/vintage1'
+            font_size: dp(25)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+        Slider:
+            id: mood_slider
+            min: 0
+            max: 100
+            pos_hint: {'center_x': 0.5, 'center_y': 0.15}
+            size_hint: (0.8, 0.05)
+            value: 50
+            
+        
+        QuestionChatBox:
+            id: question
+            padding: (10, 0)
+         
+            pos_hint: {'x': 0.05, 'center_y': 0.9}
+            #font_name: 'fonts/korean1.ttf'
+            text: 'Question'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+            font_size: dp(17)
+            size_hint: (0.75, 0.08) #if root.width < root.height else (0.3, 0.08)
+            color: (0, 0, 0)
+        AnswerChatBox:
+            id:answer
+            padding: (10, 0)
+            #pos_hint: {'center_x': 0.55, 'center_y': 0.75}
+            pos_hint: {'right': 0.95, 'center_y': 0.7}
+            text: 'Answer'
+            text_size: self.size
+            #font_name: 'fonts/korean1.ttf'
+            halign: 'left'
+            valign: 'middle'
+            font_size: dp(17)
+            size_hint: (0,0) #if root.answer == '' else (0.75, 0.05) if root.width < root.height else (0.3, 0.05)
+            color: (0, 0, 0)
+        TypeBox:
+            id: typebox
+            text: 'Type your answer...'
+            size_hint: (0.8, 0.05)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+            on_release: Factory.AnswerWriteBox().open()
+
+        Button:
+            text: 'Back'
+            size_hint: (None, None)
+            size: ('70dp', '70dp')
+            on_release:
+                app.root.current = 'main'
+                root.manager.transition.direction = 'right'
+        Button:
+            text: 'Save'
+            size_hint: (None, None)
+            size: ('70dp', '70dp')
+            pos_hint: {'right': 1}
+            
+
+
+
+
+
+<HistoryWindow>:
+    name: 'history'
+
+    RelativeLayout:
+        
+        BoxLayout:
+            orientation: 'vertical'
+            TopBar:
+                Label:
+                    text: 'March 2023'
+                    #font_name: 'fonts/kosan'
+                    color: (0,0,0)
+                    bold: True
+                    pos_hint: {'center_y': 0.5}
+                    font_size: dp(30)
+            ScrollView:
+                CalendarBox:
+                    size_hint: (1, None)
+                    height: 3000
+            BottomBar:
+                Button:
+                    text: 'Back'
+                    size_hint: (None, None)
+                    size: ('70dp', '70dp')
+                    on_release:
+                        app.root.current = 'main'
+                        root.manager.transition.direction = 'right'
+
+
+<SettingWindow>:
+    name: 'setting'
+
+    RelativeLayout:
+
+        Label:
+            text: 'Setting'
+            #font_name: 'fonts/vintage1'
+            font_size: '80dp'
+            outline_color: (100/255, 100/255, 100/255)
+            outline_width: '10dp'
+
+        Button:
+            text: 'Back'
+            size_hint: (None, None)
+            size: ('70dp', '70dp')
+            on_release:
+                app.root.current = 'main'
+                root.manager.transition.direction = 'right'
+
+
+<OptionButton@Button>:
+    background_color: (0,0,0,0)
+    background_normal: ''
+    canvas.before:
+        Color:
+            rgba: (205/255, 140/255, 185/255, 1) if self.state == 'normal' else (165/255, 50/255, 145/255, 1)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [0]
+        Color:
+            rgba: (165/255, 50/255, 145/255, 1) if self.state == 'normal' else (80/255, 0/255, 95/255, 1)
+        Line:
+            rounded_rectangle: (self.pos[0], self.pos[1], self.size[0], self.size[1], 0)
+            width: 1.5
+
+<QuestionChatBox@Label>:
+    canvas.before:
+        Color:
+            rgba: (200/255, 200/255, 200/255, 0.5)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [10,10,10,0]
+        Triangle:
+            points: (self.pos[0] - 15, self.pos[1], self.pos[0], self.pos[1], self.pos[0], self.pos[1] + self.size[1]/4)
+
+
+<AnswerChatBox@Label>:
+    canvas.before:
+        Color:
+            rgba: (200/255, 200/255, 200/255, 0.5)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [10,10,0,10]
+        Triangle:
+            points: (self.pos[0] + self.size[0], self.pos[1], self.pos[0] + self.size[0] + 15, self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]/4)
+
+
+<TypeBox@Button>:
+    background_color: (0,0,0,0)
+    background_normal: ''
+    canvas.before:
+        Color:
+            rgba: (200/255, 200/255, 200/255, 0.4) if self.state == 'normal' else (200/255, 200/255, 200/255, 0.7)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [30,30,30,30]
+
+
+<TopBar@BoxLayout>:
+    size_hint: (1, 0.08)
+    canvas.before:
+        Color:
+            rgba: (240/255, 240/255, 240/255, 0.3)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [0,0,10,10]
+
+<CalendarBox@GridLayout>:
+    id: 'calendar_box'
+
+    padding: (0,10,0,10)
+    spacing: dp(5)
+    canvas.before:
+        Color:
+            rgba: (240/255, 0/255, 0/255, 0)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [10,10,10,10]
+
+<BottomBar@BoxLayout>:
+    size_hint: (1, 0.08)
+    canvas.before:
+        Color:
+            rgba: (240/255, 240/255, 240/255, 0.3)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [10,10,0,0]
+
+<SelectButton@Button>:
+    #background_color: (200/255, 200/255, 200/255, 0.4) if self.state == 'normal' else (200/255, 200/255, 200/255, 1)
+    background_color: (0,0,0,0)
+    background_normal: ''
+    canvas.before:
+        Color:
+            #rgba: (200/255, 200/255, 200/255, 0.4) if self.state == 'normal' else (200/255, 200/255, 200/255, 1)
+            rgba: (200/255, 200/255, 200/255, 0.4) if (self.disabled == False and self.state == 'normal') else (200/255, 200/255, 200/255, 1) if (self.disabled == False and self.state == 'down') else (100/255, 100/255, 100/255, 0.8)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [20]
+
+    BoxLayout:
+        padding: ['5dp', 0, '5dp',0]
+        spacing: dp(7)
+        Label:
+            id: date
+            size_hint: (0.2 , 1)
+            #text: 'root.date'
+            canvas.before:
+                Color:
+                    rgba: (0.3, 0.3, 0.3, 1)
+                Line:
+                    points: (self.size[0], 0 + 10, self.size[0], self.size[1] - 10)
+                    width: 2
+
+        Label:
+            id: question
+            text: 'question question question question question question'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+            #canvas.before:
+            #    Color:
+            #        rgba: (200/255, 2/255, 2/255, 0.4)
+            #    RoundedRectangle:
+            #        size: self.size
+            #        pos: self.pos
+            #        radius: [20]
+     
+
+
+<AnswerWriteBox@Popup>:
+    background_color: (0,0,0,0)
+    title: 'Your answer:'
+    auto_dismiss: True
+    size_hint: (0.9, 0.65)
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    BoxLayout
+        orientation: 'vertical'
+        spacing: dp(10)
+        TextInput:
+            id: answer_text
+            background_color: (0,0,0,0)
+            multiline: True
+            text: 'write here'
+            #font_size: dp(15)
+            #font_name: 'fonts/korean1.ttf'
+            canvas.before:
+                Color:
+                    rgba: (1, 1, 1, 0.2)
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [0,0,10,10]
+                Color:
+                    rgba: (1, 1, 1, 1)
+        Button:
+            size_hint: (0.2, 0.1)
+            #size: ('70dp', '70dp')
+            pos_hint: {'right': 1, 'bottom': 0}
+            text: 'Answer'
+            font_size: dp(15)
+            
+
