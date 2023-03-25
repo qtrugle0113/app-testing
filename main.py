@@ -30,6 +30,7 @@ from datetime import date, timedelta
 
 import kivy
 #import pandas as pd
+import numpy as np
 import random
 # from kivy import Config
 from kivy.app import App
@@ -46,7 +47,7 @@ def today_question():
     # questions = pd.read_csv('data/questions_list.csv')
     # ques_id = random.randint(0, len(questions) - 1) + 1
     # today_ques = questions.loc[ques_id - 1, 'english']
-    ques_id = random.randint(0, 10) + 1
+    ques_id = random.randint(0, 10) + 1 + np.random.rand(1)[0]
     today_ques = str(ques_id)
     return today_ques, ques_id
 
