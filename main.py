@@ -29,7 +29,7 @@ from calendar import monthrange
 from datetime import date, timedelta
 
 import kivy
-import pandas as pd
+#import pandas as pd
 import random
 # from kivy import Config
 from kivy.app import App
