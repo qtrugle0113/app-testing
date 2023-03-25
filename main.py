@@ -29,26 +29,30 @@ from calendar import monthrange
 from datetime import date, timedelta
 
 import kivy
-#import pandas as pd
-import numpy as np
+# import pandas as pd
+# import numpy as np
 import random
-# from kivy import Config
+import csv
+from kivy import Config
 from kivy.app import App
 from kivy.properties import StringProperty
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 
+#Config.set('graphics', 'width', '450')
+#Config.set('graphics', 'height', '1000')
 
-# Config.set('graphics', 'width', '450')
-# Config.set('graphics', 'height', '1000')
 
 def today_question():
-    # questions = pd.read_csv('data/questions_list.csv')
-    # ques_id = random.randint(0, len(questions) - 1) + 1
-    # today_ques = questions.loc[ques_id - 1, 'english']
-    ques_id = random.randint(0, 10) + 1 + np.random.rand(1)[0]
-    today_ques = str(ques_id)
+    questions = []
+    with open('data/questions_list.csv', 'r') as file:
+        questions_list = csv.reader(file)
+        for row in questions_list:
+            questions.append(row)
+
+    ques_id = random.randint(1, len(questions) - 1)
+    today_ques = questions[ques_id][2]
     return today_ques, ques_id
 
 
