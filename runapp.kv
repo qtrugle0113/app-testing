@@ -112,7 +112,7 @@ WindowManager:
             padding: (10, 0)
             pos_hint: {'x': 0.05, 'center_y': 0.9}
             #font_name: 'fonts/korean1.ttf'
-            text: 'Question'
+            text: root.question
             text_size: self.size
             halign: 'left'
             valign: 'middle'
@@ -178,7 +178,7 @@ WindowManager:
             ScrollView:
                 CalendarBox:
                     size_hint: (1, None)
-                    height: 130 * root.days_in_month
+                    height: 250 * root.days_in_month
                     #height: self.minimum_height
             BottomBar:
                 Button:
@@ -224,7 +224,7 @@ WindowManager:
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [0]
+            radius: [20]
         Color:
             rgba: (165/255, 50/255, 145/255, 1) if self.state == 'normal' else (80/255, 0/255, 95/255, 1)
         Line:
@@ -238,7 +238,7 @@ WindowManager:
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [20,20,20,0]
+            radius: [40,40,40,0]
         Triangle:
             points: (self.pos[0] - 15, self.pos[1], self.pos[0], self.pos[1], self.pos[0], self.pos[1] + self.size[1]/4)
 
@@ -250,7 +250,7 @@ WindowManager:
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [20,20,0,20]
+            radius: [40,40,0,40]
         Triangle:
             points: (self.pos[0] + self.size[0], self.pos[1], self.pos[0] + self.size[0] + 15, self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]/4)
 
@@ -264,7 +264,7 @@ WindowManager:
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [35,35,35,35]
+            radius: [50,50,50,50]
 
 
 <TopBar@BoxLayout>:
@@ -275,7 +275,7 @@ WindowManager:
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [0,0,10,10]
+            radius: [0,0,20,20]
 
 <CalendarBox>:
     id: 'calendar_box'
@@ -298,7 +298,7 @@ WindowManager:
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [10,10,0,0]
+            radius: [20,20,0,0]
 
 <SelectDayLayout>:
     size_hint: (1, 0.25)
@@ -372,7 +372,7 @@ WindowManager:
                 RoundedRectangle:
                     size: self.size
                     pos: self.pos
-                    radius: [0,0,20,20]
+                    radius: [0,0,40,40]
                 Color:
                     rgba: (1, 1, 1, 1)
         Button:
