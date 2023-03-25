@@ -29,6 +29,7 @@ from datetime import date, timedelta  # datetime
 import kivy
 #from kivy import Config
 from kivy.app import App
+from kivy.properties import StringProperty
 from kivy.uix.screenmanager import Screen, ScreenManager
 
 #Config.set('graphics', 'width', '450')
@@ -37,7 +38,6 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 class WindowManager(ScreenManager):
     pass
 
-
 class MainWindow(Screen):
     pass
 
@@ -45,7 +45,19 @@ class HistoryWindow(Screen):
     pass
 
 class QnAWindow(Screen):
-    pass
+    mood = StringProperty('')
+
+    def on_slider_value(self, widget):
+        if widget.value < 20:
+            self.mood = 'sad'
+        elif widget.value < 40:
+            self.mood = 'negative'
+        elif widget.value < 60:
+            self.mood = 'normal'
+        elif widget.value < 80:
+            self.mood = 'positive'
+        else:
+            self.mood = 'happy'
 
 class SettingWindow(Screen):
     pass
