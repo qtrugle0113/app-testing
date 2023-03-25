@@ -43,9 +43,11 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 # Config.set('graphics', 'height', '1000')
 
 def today_question():
-    questions = pd.read_csv('data/questions_list.csv')
-    ques_id = random.randint(0, len(questions) - 1) + 1
-    today_ques = questions.loc[ques_id - 1, 'english']
+    #questions = pd.read_csv('data/questions_list.csv')
+    #ques_id = random.randint(0, len(questions) - 1) + 1
+    #today_ques = questions.loc[ques_id - 1, 'english']
+    ques_id = random.randint(0, 10) + 1
+    today_ques = str(ques_id)
     return today_ques, ques_id
 
 
