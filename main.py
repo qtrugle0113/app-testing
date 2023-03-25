@@ -25,24 +25,86 @@ from kivy.uix.widget import Widget
 from calendar import monthrange
 from datetime import date, timedelta  # datetime
 '''
+from calendar import monthrange
+from datetime import date, timedelta
 
 import kivy
 #from kivy import Config
 from kivy.app import App
 from kivy.properties import StringProperty
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 
 #Config.set('graphics', 'width', '450')
 #Config.set('graphics', 'height', '1000')
 
+
 class WindowManager(ScreenManager):
     pass
+
 
 class MainWindow(Screen):
     pass
 
+
 class HistoryWindow(Screen):
+    today = date.today()
+    year = today.year
+    month = today.month
+    day = today.day
+
+    days_in_month = monthrange(year, month)[1]
+
+    if month == 1:
+        month_name = 'January'
+    elif month == 2:
+        month_name = 'February'
+    elif month == 3:
+        month_name = 'March'
+    elif month == 4:
+        month_name = 'April'
+    elif month == 5:
+        month_name = 'May'
+    elif month == 6:
+        month_name = 'June'
+    elif month == 7:
+        month_name = 'July'
+    elif month == 8:
+        month_name = 'August'
+    elif month == 9:
+        month_name = 'September'
+    elif month == 10:
+        month_name = 'October'
+    elif month == 11:
+        month_name = 'November'
+    else:
+        month_name = 'December'
+
+    today_text = month_name + ' ' + str(year)
+
+
+class SelectDayLayout(RelativeLayout):
     pass
+
+
+class CalendarBox(GridLayout):
+    cols = 1
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        for i in range(monthrange(date.today().year, date.today().month)[1]):
+            b = SelectDayLayout()
+            self.add_widget(b)
+
+            day = date.today().replace(day=1) + timedelta(days=i)
+
+            b.ids.date.text = day.strftime('%m/%d')
+
+            b.ids.question.text = 'question'
+
+            b.ids.mood.source = 'images/moods/happy.png'
+
 
 class QnAWindow(Screen):
     mood = StringProperty('')
@@ -59,8 +121,11 @@ class QnAWindow(Screen):
         else:
             self.mood = 'happy'
 
+
 class SettingWindow(Screen):
     pass
+
+
 '''
 def today_question():
     questions = pd.read_csv('data/questions_list.csv')
@@ -241,6 +306,7 @@ class CalendarBox(GridLayout):
 class SettingWindow(Screen):
     pass
 '''
+
 
 class RunApp(App):
     # def build(self):

@@ -1,4 +1,6 @@
 #:import Factory kivy.factory.Factory
+#:import date datetime
+#:import monthrange calendar
 WindowManager:
     MainWindow:
     QnAWindow:
@@ -154,7 +156,6 @@ WindowManager:
 
 
 
-
 <HistoryWindow>:
     name: 'history'
 
@@ -168,8 +169,8 @@ WindowManager:
             orientation: 'vertical'
             TopBar:
                 Label:
-                    text: 'March 2023'
-                    #font_name: 'fonts/kosan'
+                    text: root.today_text
+                    font_name: 'fonts/kosan'
                     color: (0,0,0)
                     bold: True
                     pos_hint: {'center_y': 0.5}
@@ -177,7 +178,8 @@ WindowManager:
             ScrollView:
                 CalendarBox:
                     size_hint: (1, None)
-                    height: 3000
+                    height: 130 * root.days_in_month
+                    #height: self.minimum_height
             BottomBar:
                 Button:
                     text: 'Back'
@@ -236,7 +238,7 @@ WindowManager:
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [10,10,10,0]
+            radius: [20,20,20,0]
         Triangle:
             points: (self.pos[0] - 15, self.pos[1], self.pos[0], self.pos[1], self.pos[0], self.pos[1] + self.size[1]/4)
 
@@ -248,7 +250,7 @@ WindowManager:
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [10,10,0,10]
+            radius: [20,20,0,20]
         Triangle:
             points: (self.pos[0] + self.size[0], self.pos[1], self.pos[0] + self.size[0] + 15, self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]/4)
 
@@ -262,7 +264,7 @@ WindowManager:
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [30,30,30,30]
+            radius: [35,35,35,35]
 
 
 <TopBar@BoxLayout>:
@@ -275,7 +277,7 @@ WindowManager:
             pos: self.pos
             radius: [0,0,10,10]
 
-<CalendarBox@GridLayout>:
+<CalendarBox>:
     id: 'calendar_box'
 
     padding: (0,10,0,10)
@@ -297,6 +299,42 @@ WindowManager:
             size: self.size
             pos: self.pos
             radius: [10,10,0,0]
+
+<SelectDayLayout>:
+    size_hint: (1, 0.25)
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    SelectButton:
+        id: select_btn
+        #on_release:
+        #    app.root.current = 'qna_history'
+        #    app.root.get_screen('qna_history').access_history(root.ids.date.text)
+
+    BoxLayout:
+        padding: ['5dp', 0, '5dp',0]
+        spacing: dp(7)
+        Label:
+            id: date
+            size_hint: (0.2 , 1)
+            canvas.before:
+                Color:
+                    rgba: (0.3, 0.3, 0.3, 1)
+                Line:
+                    points: (self.size[0], 0 + 10, self.size[0], self.size[1] - 10)
+                    width: 2
+        Label:
+            id: question
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+        Image:
+            id: mood
+            size_hint: (0.15 , 1)
+            canvas.before:
+                Color:
+                    rgba: (0.3, 0.3, 0.3, 1)
+                Line:
+                    points: (self.pos[0] - dp(5), 0 + 10, self.pos[0] - dp(5), self.size[1] - 10)
+                    width: 2
 
 <SelectButton@Button>:
     #background_color: (200/255, 200/255, 200/255, 0.4) if self.state == 'normal' else (200/255, 200/255, 200/255, 1)
