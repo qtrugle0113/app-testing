@@ -122,13 +122,13 @@ WindowManager:
             padding: (10, 0)
             #pos_hint: {'center_x': 0.55, 'center_y': 0.75}
             pos_hint: {'right': 0.95, 'center_y': 0.7}
-            text: 'Answer'
+            text: root.answer
             text_size: self.size
             #font_name: 'fonts/korean1.ttf'
             halign: 'left'
             valign: 'middle'
             font_size: dp(17)
-            size_hint: (0.75,0.05)
+            size_hint: (0, 0) #(0.75,0.05)
             color: (0, 0, 0)
         TypeBox:
             id: typebox
@@ -149,7 +149,7 @@ WindowManager:
             size_hint: (None, None)
             size: ('70dp', '70dp')
             pos_hint: {'right': 1}
-
+            on_release: root.save_answer()
 
 
 
@@ -361,7 +361,7 @@ WindowManager:
             id: answer_text
             background_color: (0,0,0,0)
             multiline: True
-            text: ''
+            text: app.root.get_screen('qna').answer
             #font_size: dp(15)
             #font_name: 'fonts/korean1.ttf'
             canvas.before:
@@ -381,4 +381,4 @@ WindowManager:
             font_size: dp(15)
             on_release:
                 root.dismiss()
-
+                app.root.get_screen('qna').set_answer(answer_text.text)

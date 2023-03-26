@@ -40,8 +40,9 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 
-#Config.set('graphics', 'width', '450')
-#Config.set('graphics', 'height', '1000')
+
+# Config.set('graphics', 'width', '450')
+# Config.set('graphics', 'height', '1000')
 
 
 def today_question():
@@ -117,9 +118,29 @@ class CalendarBox(GridLayout):
 
             b.ids.date.text = day.strftime('%m/%d')
 
-            b.ids.question.text = 'question'
+            answers = []
 
-            b.ids.mood.source = 'images/moods/happy.png'
+            with open('user/answers_list.csv', 'r') as file:
+                answers_list = csv.reader(file)
+                for row in answers_list:
+                    answers.append(row)
+
+            question = ''
+            mood = ''
+            for j in range(len(answers)):
+                if answers[j][1] == str(day):
+                    question = answers[j][2]
+                    mood = answers[j][4]
+
+            b.ids.question.text = question
+            if mood == '':
+                b.ids.mood.source = 'images/moods/normal.png'
+                b.ids.mood.color = (1, 1, 1, 0)
+            else:
+                b.ids.mood.source = 'images/moods/' + mood + '.png'
+
+            if question == '':
+                b.ids.select_btn.disabled = True
 
 
 class QnAWindow(Screen):
@@ -138,6 +159,57 @@ class QnAWindow(Screen):
             self.mood = 'happy'
 
     question, ques_id = today_question()
+    answer = ''
+
+    def set_answer(self, ans):
+        self.answer = ans
+        self.ids.answer.text = self.answer
+        self.ids.answer.size_hint = (0.75, 0.05)
+
+        answers = []
+        with open('user/answers_list.csv', 'r') as file:
+            answers_list = csv.reader(file)
+            for row in answers_list:
+                answers.append(row)
+
+        is_answered = False
+
+        for i in range(len(answers)):
+            if answers[i][1] == str(date.today()):
+                answers[i] = [self.ques_id, str(date.today()), self.question, self.answer, self.mood]
+                is_answered = True
+
+        if is_answered:
+            with open('user/answers_list.csv', 'w', newline='') as file:
+                new_list = csv.writer(file)
+                new_list.writerows(answers)
+        else:
+            with open('user/answers_list.csv', 'a', newline='') as file:
+                answers_list = csv.writer(file)
+                answers_list.writerow([self.ques_id, str(date.today()), self.question, self.answer, self.mood])
+
+    def save_answer(self):
+        answers = []
+        with open('user/answers_list.csv', 'r') as file:
+            answers_list = csv.reader(file)
+            for row in answers_list:
+                answers.append(row)
+
+        is_answered = False
+
+        for i in range(len(answers)):
+            if answers[i][1] == str(date.today()):
+                answers[i][4] = self.mood
+                is_answered = True
+
+        if is_answered:
+            with open('user/answers_list.csv', 'w', newline='') as file:
+                new_list = csv.writer(file)
+                new_list.writerows(answers)
+        else:
+            with open('user/answers_list.csv', 'a', newline='') as file:
+                answers_list = csv.writer(file)
+                answers_list.writerow([self.ques_id, str(date.today()), self.question, self.answer, self.mood])
 
 
 class SettingWindow(Screen):
