@@ -1,7 +1,7 @@
 from calendar import monthrange
 from datetime import date, datetime, timedelta
 
-#import kivy
+# import kivy
 # import pandas as pd
 # import numpy as np
 import random
@@ -165,10 +165,12 @@ class CalendarBox(GridLayout):
                     answers.append(row)
 
             question = ''
+            answer = ''
             mood = ''
             for j in range(len(answers)):
                 if answers[j][1] == str(day):
                     question = answers[j][2]
+                    answer = answers[j][3]
                     mood = answers[j][4]
                     break
 
@@ -179,8 +181,14 @@ class CalendarBox(GridLayout):
             else:
                 b.ids.mood.source = 'images/moods/' + mood + '.png'
 
-            if question == '':
+            if day != date.today() and (question == '' or (answer == '' and mood == '')):
                 b.ids.select_btn.disabled = True
+
+            #if day == date.today():
+            #    b.bind(on_release=self.switch_screen)
+
+    #def switch_screen(self, *args):
+    #    runApp.screen_manager.current.current = 'qna'
 
     def update_data(self, today_ques, today_mood):
         self.ids[date.today()].ids.select_btn.disabled = False
@@ -227,7 +235,8 @@ class QnAWindow(Screen):
 
         for i in range(len(answers)):  # backward search
             if answers[len(answers) - i - 1][1] == str(date.today()):
-                answers[len(answers) - i - 1] = [self.ques_id, str(date.today()), self.question, self.answer, self.mood, int(self.mood_value)]
+                answers[len(answers) - i - 1] = [self.ques_id, str(date.today()), self.question, self.answer, self.mood,
+                                                 int(self.mood_value)]
                 is_answered = True
 
         if is_answered:
@@ -237,7 +246,8 @@ class QnAWindow(Screen):
         else:
             with open('user/answers_list.csv', 'a', newline='') as file:
                 answers_list = csv.writer(file)
-                answers_list.writerow([self.ques_id, str(date.today()), self.question, self.answer, self.mood, int(self.mood_value)])
+                answers_list.writerow(
+                    [self.ques_id, str(date.today()), self.question, self.answer, self.mood, int(self.mood_value)])
 
     def save_answer(self, touch, widget):
         if touch.grab_current == widget:
@@ -251,7 +261,8 @@ class QnAWindow(Screen):
 
             for i in range(len(answers)):
                 if answers[len(answers) - i - 1][1] == str(date.today()):
-                    answers[len(answers) - i - 1] = [self.ques_id, str(date.today()), self.question, self.answer, self.mood, int(self.mood_value)]
+                    answers[len(answers) - i - 1] = [self.ques_id, str(date.today()), self.question, self.answer,
+                                                     self.mood, int(self.mood_value)]
                     is_answered = True
 
             if is_answered:
@@ -261,7 +272,8 @@ class QnAWindow(Screen):
             else:
                 with open('user/answers_list.csv', 'a', newline='') as file:
                     answers_list = csv.writer(file)
-                    answers_list.writerow([self.ques_id, str(date.today()), self.question, self.answer, self.mood, int(self.mood_value)])
+                    answers_list.writerow(
+                        [self.ques_id, str(date.today()), self.question, self.answer, self.mood, int(self.mood_value)])
 
 
 class QnAHistoryWindow(Screen):
@@ -284,17 +296,22 @@ class QnAHistoryWindow(Screen):
                 self.question = answers[i][2]
                 self.answer = answers[i][3]
                 self.mood = answers[i][4]
-                self.mood_value = int(answers[i][5])
+                self.mood_value = answers[i][5]
                 break
 
         self.ids.last_question.text = self.question
         self.ids.last_answer.text = self.answer
+        if self.mood_value == '':
+            self.mood_value = 100
         self.ids.last_mood_slider.value = self.mood_value
         if self.mood == '':
             self.ids.last_mood.source = 'images/moods/normal.png'
             self.ids.last_mood.color = (1, 1, 1, 0)
+            self.ids.last_mood_slider.value_track_color = [0.8, 0.1, 0.9, 0]
         else:
             self.ids.last_mood.source = 'images/moods/' + self.mood + '.png'
+            self.ids.last_mood.color = (1, 1, 1, 1)
+            self.ids.last_mood_slider.value_track_color = [0.8, 0.1, 0.9, 0.4]
 
 
 class SettingWindow(Screen):

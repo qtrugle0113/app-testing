@@ -93,7 +93,7 @@ WindowManager:
         Slider:
             id: mood_slider
             value_track: True
-            value_track_color: [0.8, 0.1, 0.9, 0.35]
+            value_track_color: [0.8, 0.1, 0.9, 0.4]
             min: 0
             max: 200
             pos_hint: {'center_x': 0.5, 'center_y': 0.15}
@@ -172,10 +172,10 @@ WindowManager:
             min: 0
             max: 200
             value_track: True
-            value_track_color: [0.8, 0.1, 0.9, 0.35]
+            value_track_color: [0.8, 0.1, 0.9, 0.4]
             pos_hint: {'center_x': 0.5, 'center_y': 0.15}
             size_hint: (0.8, 0.05)
-            value: root.mood_value
+            #value: root.mood_value
             disabled: True
         Image:
             id: last_mood
@@ -207,7 +207,7 @@ WindowManager:
             halign: 'left'
             valign: 'middle'
             font_size: dp(17)
-            size_hint: (0.75, 0.05) if root.width < root.height else (0.3, 0.05)
+            size_hint: (0.75, 0.05)
             color: (0, 0, 0)
 
 
