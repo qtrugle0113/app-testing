@@ -3,6 +3,7 @@ WindowManager:
     MainWindow:
     QnAWindow:
     HistoryWindow:
+    QnAHistoryWindow:
     SettingWindow:
 #QnAWindow:
 
@@ -39,7 +40,7 @@ WindowManager:
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
                 Label:
-                    text: '    Find\nYourself'
+                    text: '   Find\nYourself'
                     color: (50/255, 50/255, 50/255, 1) if root.ids.main_btn.state == 'normal' else (10/255, 10/255, 10/255, 1)
                     font_name: 'fonts/vintage.ttf'
                     #font_size: (self.height + self.width)/25 if root.ids.main_btn.state == 'normal' else (self.height + self.width)/24
@@ -91,12 +92,17 @@ WindowManager:
             pos_hint: {'center_x': 0.5, 'center_y': 0.2}
         Slider:
             id: mood_slider
+            value_track: True
+            value_track_color: [0.8, 0.1, 0.9, 0.35]
             min: 0
-            max: 100
+            max: 200
             pos_hint: {'center_x': 0.5, 'center_y': 0.15}
             size_hint: (0.8, 0.05)
-            value: 50
+            value: root.mood_value
             on_value: root.on_slider_value(self)
+            on_touch_up:
+                root.save_answer(args[1], self)
+                app.root.get_screen('history').ids.calendar_box.update_data(app.root.get_screen('qna').question, app.root.get_screen('qna').mood)
         Image:
             source: 'images/moods/normal.png' if root.mood == '' else 'images/moods/' + root.mood + '.png'
             #size_hint: (None, None)
@@ -109,7 +115,7 @@ WindowManager:
             id: question
             padding: (10, 0)
             pos_hint: {'x': 0.05, 'center_y': 0.9}
-            #font_name: 'fonts/korean1.ttf'
+            font_name: 'fonts/korean1.ttf'
             text: root.question
             text_size: self.size
             halign: 'left'
@@ -124,15 +130,16 @@ WindowManager:
             pos_hint: {'right': 0.95, 'center_y': 0.7}
             text: root.answer
             text_size: self.size
-            #font_name: 'fonts/korean1.ttf'
+            font_name: 'fonts/korean1.ttf'
             halign: 'left'
             valign: 'middle'
             font_size: dp(17)
-            size_hint: (0, 0) #(0.75,0.05)
+            size_hint: (0, 0) if root.answer == '' else (0.75,0.05)
             color: (0, 0, 0)
         TypeBox:
             id: typebox
             text: 'Type your answer...'
+            font_name: 'fonts/korean1.ttf'
             size_hint: (0.8, 0.05)
             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
             on_release: Factory.AnswerWriteBox().open()
@@ -144,14 +151,64 @@ WindowManager:
             on_release:
                 app.root.current = 'main'
                 root.manager.transition.direction = 'right'
-        Button:
-            text: 'Save'
-            size_hint: (None, None)
-            size: ('70dp', '70dp')
-            pos_hint: {'right': 1}
-            on_release: root.save_answer()
 
 
+<QnAHistoryWindow>:
+    name: 'qna_history'
+
+    RelativeLayout:
+        Image:
+            source: 'images/sunset.jpg'
+            allow_stretch: True
+            keep_ratio: False
+            color: (1,1,1,0.5)
+        Label:
+            text: "Your mood:"
+            font_name: 'fonts/vintage1'
+            font_size: dp(25)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+        Slider:
+            id: last_mood_slider
+            min: 0
+            max: 200
+            value_track: True
+            value_track_color: [0.8, 0.1, 0.9, 0.35]
+            pos_hint: {'center_x': 0.5, 'center_y': 0.15}
+            size_hint: (0.8, 0.05)
+            value: root.mood_value
+            disabled: True
+        Image:
+            id: last_mood
+            source: 'images/moods/normal.png' if root.mood == '' else 'images/moods/' + root.mood + '.png'
+            #size_hint: (None, None)
+            #width: dp(70)
+            #height: dp(70)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.075}
+            color: (1,1,1,0) if root.mood == '' else (1,1,1,1)
+        QuestionChatBox:
+            id: last_question
+            padding: (10, 0)
+            pos_hint: {'x': 0.05, 'center_y': 0.9}
+            font_name: 'fonts/korean1.ttf'
+            text: root.question
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+            font_size: dp(17)
+            size_hint: (0.75, 0.08) if root.width < root.height else (0.3, 0.08)
+            color: (0, 0, 0)
+        AnswerChatBox:
+            id:last_answer
+            padding: (10, 0)
+            pos_hint: {'right': 0.95, 'center_y': 0.7}
+            text: root.answer
+            text_size: self.size
+            font_name: 'fonts/korean1.ttf'
+            halign: 'left'
+            valign: 'middle'
+            font_size: dp(17)
+            size_hint: (0.75, 0.05) if root.width < root.height else (0.3, 0.05)
+            color: (0, 0, 0)
 
 
 <HistoryWindow>:
@@ -175,6 +232,7 @@ WindowManager:
                     font_size: dp(30)
             ScrollView:
                 CalendarBox:
+                    id: calendar_box
                     size_hint: (1, None)
                     height: 250 * root.days_in_month
                     #height: self.minimum_height
@@ -276,8 +334,6 @@ WindowManager:
             radius: [0,0,20,20]
 
 <CalendarBox>:
-    id: 'calendar_box'
-
     padding: (0,10,0,10)
     spacing: dp(5)
     canvas.before:
@@ -303,15 +359,17 @@ WindowManager:
     pos_hint: {'center_x': .5, 'center_y': .5}
     SelectButton:
         id: select_btn
-        #on_release:
-        #    app.root.current = 'qna_history'
-        #    app.root.get_screen('qna_history').access_history(root.ids.date.text)
+        on_release:
+            app.root.current = 'qna_history'
+            app.root.get_screen('qna_history').manager.transition.direction = 'left'
+            app.root.get_screen('qna_history').access_history(root.ids.date.text)
 
     BoxLayout:
         padding: ['5dp', 0, '5dp',0]
         spacing: dp(7)
         Label:
             id: date
+            font_name: 'fonts/korean1.ttf'
             size_hint: (0.2 , 1)
             canvas.before:
                 Color:
@@ -321,6 +379,7 @@ WindowManager:
                     width: 2
         Label:
             id: question
+            font_name: 'fonts/korean1.ttf'
             text_size: self.size
             halign: 'left'
             valign: 'middle'
@@ -351,7 +410,8 @@ WindowManager:
 <AnswerWriteBox@Popup>:
     background_color: (0,0,0,0)
     title: 'Your answer:'
-    auto_dismiss: True
+    font_name: 'fonts/korean1.ttf'
+    auto_dismiss: False
     size_hint: (0.9, 0.65)
     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
     BoxLayout
@@ -362,6 +422,7 @@ WindowManager:
             background_color: (0,0,0,0)
             multiline: True
             text: app.root.get_screen('qna').answer
+            font_name: 'fonts/korean1.ttf'
             #font_size: dp(15)
             #font_name: 'fonts/korean1.ttf'
             canvas.before:
@@ -373,12 +434,24 @@ WindowManager:
                     radius: [0,0,40,40]
                 Color:
                     rgba: (1, 1, 1, 1)
-        Button:
-            size_hint: (0.2, 0.1)
-            #size: ('70dp', '70dp')
-            pos_hint: {'right': 1, 'bottom': 0}
-            text: 'Answer'
-            font_size: dp(15)
-            on_release:
-                root.dismiss()
-                app.root.get_screen('qna').set_answer(answer_text.text)
+        BoxLayout:
+            size_hint: (1, 0.1)
+            spacing: dp(200)
+            Button:
+                #size_hint: (0.1, 1)
+                #size: ('70dp', '70dp')
+                pos_hint: {'x': 0, 'bottom': 0}
+                text: 'Close'
+                font_size: dp(15)
+                on_release:
+                    root.dismiss()
+            Button:
+                #size_hint: (0.1, 1)
+                #size: ('70dp', '70dp')
+                pos_hint: {'right': 1, 'bottom': 0}
+                text: 'Answer'
+                font_size: dp(15)
+                on_release:
+                    root.dismiss()
+                    app.root.get_screen('qna').set_answer(answer_text.text)
+                    app.root.get_screen('history').ids.calendar_box.update_data(app.root.get_screen('qna').question, app.root.get_screen('qna').mood)

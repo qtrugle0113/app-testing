@@ -1,2 +1,4 @@
-id,date,question,answer,mood
-119,2023-03-26,If you could live someone else's life for one day who would it be?,kl,happy
+id,date,question,answer,mood,mood_value
+272,2023-03-26,How hungry are you right now?,no,sad,2
+2,2023-03-27,Can people change?,I think no,positive,75
+35,2023-03-28,"Outside, the weather is ………….. .",so so ...i'm not suare but i will do it hehehehe,normal,99
