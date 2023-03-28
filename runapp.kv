@@ -235,7 +235,6 @@ WindowManager:
                     id: calendar_box
                     size_hint: (1, None)
                     height: 250 * root.days_in_month
-                    #height: self.minimum_height
             BottomBar:
                 Button:
                     text: 'Back'
@@ -364,8 +363,17 @@ WindowManager:
             app.root.get_screen('qna_history').manager.transition.direction = 'left'
             app.root.get_screen('qna_history').access_history(root.ids.date.text)
     BoxLayout:
+        id: cbox
         padding: ['5dp', 0, '5dp',0]
         spacing: dp(7)
+        canvas.before:
+            Color:
+                id: canvas_color
+                rgba: (200/255, 200/255, 200/255, 0.4) if (root.ids.select_btn.disabled == False and root.ids.select_btn.state == 'normal') else (200/255, 200/255, 200/255, 1) if (root.ids.select_btn.disabled == False and root.ids.select_btn.state == 'down') else (100/255, 100/255, 100/255, 0.8)
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: [20]
         Label:
             id: date
             font_name: 'fonts/korean1.ttf'
@@ -393,18 +401,20 @@ WindowManager:
                     width: 2
 
 <SelectButton@Button>:
+    size_hint: (0.85, 1)
+    pos_hint: {'right': 1}
     #background_color: (200/255, 200/255, 200/255, 0.4) if self.state == 'normal' else (200/255, 200/255, 200/255, 1)
-    background_color: (0,0,0,0)
+    background_color: (1,0,0,0)
     background_normal: ''
-    canvas.before:
-        Color:
-            id: canvas_color
-            #rgba: (200/255, 200/255, 200/255, 0.4) if self.state == 'normal' else (200/255, 200/255, 200/255, 1)
-            rgba: (200/255, 200/255, 200/255, 0.4) if (self.disabled == False and self.state == 'normal') else (200/255, 200/255, 200/255, 1) if (self.disabled == False and self.state == 'down') else (100/255, 100/255, 100/255, 0.8)
-        RoundedRectangle:
-            size: self.size
-            pos: self.pos
-            radius: [20]
+    #canvas.before:
+    #    Color:
+    #        id: canvas_color
+    #        #rgba: (200/255, 200/255, 200/255, 0.4) if self.state == 'normal' else (200/255, 200/255, 200/255, 1)
+    #        rgba: (200/255, 200/255, 200/255, 0.4) if (self.disabled == False and self.state == 'normal') else (200/255, 200/255, 200/255, 1) if (self.disabled == False and self.state == 'down') else (100/255, 100/255, 100/255, 0.8)
+    #    RoundedRectangle:
+    #        size: self.size
+    #        pos: self.pos
+    #        radius: [20]
 
 
 <AnswerWriteBox@Popup>:
@@ -424,7 +434,6 @@ WindowManager:
             text: app.root.get_screen('qna').answer
             font_name: 'fonts/korean1.ttf'
             #font_size: dp(15)
-            #font_name: 'fonts/korean1.ttf'
             canvas.before:
                 Color:
                     rgba: (1, 1, 1, 0.2)

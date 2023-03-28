@@ -152,10 +152,8 @@ class CalendarBox(GridLayout):
         for i in range(monthrange(self.today.year, self.today.month)[1]):
             day = date.today().replace(day=1) + timedelta(days=i)
             b = SelectDayLayout()
-            #self.ids[day] = b
+            self.ids[day] = b
             self.add_widget(b)
-
-            # print(b.my_id)
 
             b.ids.date.text = day.strftime('%m/%d')
 
