@@ -360,10 +360,9 @@ WindowManager:
     SelectButton:
         id: select_btn
         on_release:
-            app.root.current = 'qna_history'
+            #app.root.current = 'qna_history'
             app.root.get_screen('qna_history').manager.transition.direction = 'left'
             app.root.get_screen('qna_history').access_history(root.ids.date.text)
-
     BoxLayout:
         padding: ['5dp', 0, '5dp',0]
         spacing: dp(7)
@@ -399,6 +398,7 @@ WindowManager:
     background_normal: ''
     canvas.before:
         Color:
+            id: canvas_color
             #rgba: (200/255, 200/255, 200/255, 0.4) if self.state == 'normal' else (200/255, 200/255, 200/255, 1)
             rgba: (200/255, 200/255, 200/255, 0.4) if (self.disabled == False and self.state == 'normal') else (200/255, 200/255, 200/255, 1) if (self.disabled == False and self.state == 'down') else (100/255, 100/255, 100/255, 0.8)
         RoundedRectangle:

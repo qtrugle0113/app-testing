@@ -145,15 +145,17 @@ class SelectDayLayout(RelativeLayout):
 
 class CalendarBox(GridLayout):
     cols = 1
+    today = date.today()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        for i in range(monthrange(date.today().year, date.today().month)[1]):
+        for i in range(monthrange(self.today.year, self.today.month)[1]):
             day = date.today().replace(day=1) + timedelta(days=i)
-
             b = SelectDayLayout()
-            self.ids[day] = b
+            #self.ids[day] = b
             self.add_widget(b)
+
+            # print(b.my_id)
 
             b.ids.date.text = day.strftime('%m/%d')
 
@@ -183,12 +185,12 @@ class CalendarBox(GridLayout):
 
             if day != date.today() and (question == '' or (answer == '' and mood == '')):
                 b.ids.select_btn.disabled = True
-
-            #if day == date.today():
-            #    b.bind(on_release=self.switch_screen)
-
-    #def switch_screen(self, *args):
-    #    runApp.screen_manager.current.current = 'qna'
+            # Move to QnA Screen if select date is today
+            if day == date.today():
+                b.ids.select_btn.bind(on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
+            else:
+                b.ids.select_btn.bind(
+                    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
 
     def update_data(self, today_ques, today_mood):
         self.ids[date.today()].ids.select_btn.disabled = False
