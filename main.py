@@ -112,20 +112,8 @@ class HistoryWindow(Screen):
 
     days_in_month = monthrange(year, month)[1]
 
-    months = {
-        1: 'January',
-        2: 'February',
-        3: 'March',
-        4: 'April',
-        5: 'May',
-        6: 'June',
-        7: 'July',
-        8: 'August',
-        9: 'September',
-        10: 'October',
-        11: 'November',
-        12: 'December'
-    }
+    months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
+              7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
 
     today_text = months[month] + ' ' + str(year)
 
@@ -136,12 +124,15 @@ class HistoryWindow(Screen):
                 self.year = self.year - 1
             else:
                 self.month = self.month - 1
-        else:
+        elif action == 'next':
             if self.month == 12:
                 self.month = 1
                 self.year = self.year + 1
             else:
                 self.month = self.month + 1
+        else:
+            self.month = self.today.month
+            self.year = self.today.year
 
         self.today_text = self.months[self.month] + ' ' + str(self.year)
         self.ids.select_month.text = self.today_text
@@ -150,7 +141,6 @@ class HistoryWindow(Screen):
         self.ids.calendar_box.height = 250 * self.days_in_month
         self.ids.calendar_box.change_calendar(self.month, self.year)
         print(self.month, self.year)
-
 
 
 class SelectDayLayout(RelativeLayout):
@@ -165,26 +155,22 @@ class CalendarBox(GridLayout):
 
     def change_calendar(self, new_month, new_year):
         for i in range(31):
-        #for i in range(monthrange(new_year, new_month)[1]):
+            # for i in range(monthrange(new_year, new_month)[1]):
             day = self.today.replace(year=new_year, month=new_month, day=1) + timedelta(days=i)
 
             if i >= monthrange(new_year, new_month)[1]:
                 self.ids[i + 1].size_hint = (0, 0)
                 self.ids[i + 1].ids.date.text = ''
                 self.ids[i + 1].ids.question.text = ''
+                self.ids[i + 1].ids.select_btn.disabled = True
                 self.ids[i + 1].ids.mood.color = (1, 1, 1, 0)
                 self.ids[i + 1].canvas_opacity_line = 0
                 self.ids[i + 1].canvas_opacity_button = 0
                 self.ids[i + 1].canvas_opacity_border = 0
                 continue
 
-            self.ids[day.day].canvas_opacity_line = 1
-            self.ids[day.day].canvas_opacity_button = 0.4
-            #self.ids[day.day].canvas_opacity_border = 0
-
             self.ids[day.day].size_hint = (1, 0.25)
             self.ids[day.day].ids.date.text = day.strftime('%m/%d')
-            #self.ids[day.day].ids.date.text = 'ok'
             answers = []
 
             with open('user/answers_list.csv', 'r') as file:
@@ -218,34 +204,37 @@ class CalendarBox(GridLayout):
             # Move to QnA Screen if select date is today
             if day == self.today:
                 self.ids[day.day].canvas_opacity_border = 1
-                self.ids[day.day].ids.select_btn.bind(on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
+                self.ids[day.day].ids.select_btn.bind(
+                    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
             else:
                 self.ids[day.day].canvas_opacity_border = 0
                 self.ids[day.day].ids.select_btn.bind(
                     on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
 
+            self.ids[day.day].canvas_opacity_line = 1
+            self.ids[day.day].canvas_opacity_button = 0.4
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        #for i in range(monthrange(self.today.year, self.today.month)[1]):
+        # for i in range(monthrange(self.today.year, self.today.month)[1]):
         for i in range(31):
             day = self.today.replace(day=1) + timedelta(days=i)
 
             if i >= monthrange(self.today.year, self.today.month)[1]:
                 b = SelectDayLayout()
                 self.ids[i + 1] = b
-                #b.size_hint = (1, 0.25)
                 b.size_hint = (0, 0)
+                b.ids.select_btn.disabled = True
                 b.ids.mood.color = (1, 1, 1, 0)
                 b.canvas_opacity_line = 0
                 self.add_widget(b)
                 continue
-            #day = self.today.replace(day=1) + timedelta(days=i)
+            # day = self.today.replace(day=1) + timedelta(days=i)
             b = SelectDayLayout()
-            #self.ids[day] = b
+            # self.ids[day] = b
             self.ids[day.day] = b
             self.add_widget(b)
-
+            b.size_hint = (1, 0.25)
             b.ids.date.text = day.strftime('%m/%d')
 
             answers = []
@@ -283,14 +272,8 @@ class CalendarBox(GridLayout):
                     on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
 
     def update_data(self, today_ques, today_mood):
-        '''self.ids[self.today].ids.select_btn.disabled = False
-        self.ids[self.today].ids.question.text = today_ques
-        if today_mood == '':
-            self.ids[self.today].ids.mood.source = 'images/moods/normal.png'
-            self.ids[self.today].ids.mood.color = (1, 1, 1, 0)
-        else:
-            self.ids[self.today].ids.mood.source = 'images/moods/' + today_mood + '.png'
-            self.ids[self.today].ids.mood.color = (1, 1, 1, 1)'''
+        App.get_running_app().root.get_screen('history').change_month('now')
+
         self.ids[self.today.day].ids.select_btn.disabled = False
         self.ids[self.today.day].ids.question.text = today_ques
         if today_mood == '':

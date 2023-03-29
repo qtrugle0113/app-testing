@@ -34,3 +34,5 @@ id,date,question,answer,mood,mood_value
 14,2023-03-26,Are you a leader or a follower?,ans5,positive,155
 15,2023-03-27,Name one food you can cook with complete confidence?,ans1,sad,10
 231,2023-03-28,What is your favorite piece of clothing in your closet?,,positive,148
+157,2023-03-29,What was the last fruit you ate?,,happy,184
+316,2023-03-30,What do you aways avoid?,0923434,normal,114

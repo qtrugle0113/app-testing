@@ -224,12 +224,19 @@ WindowManager:
         BoxLayout:
             orientation: 'vertical'
             TopBar:
-                Button:
-                    text: 'previous'
-                    size_hint: (0.5,1)
-                    on_release:
-                        root.change_month(self.text)
-                        #root.ids.calendar_box.test_change()
+                RelativeLayout:
+                    Button:
+                        id: previous_btn
+                        background_color: (0,0,0,0)
+                        background_normal: ''
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        size_hint: (0.4, 0.8)
+                        on_release: root.change_month('previous')
+                    Image:
+                        source: 'images/previous.png'
+                        size_hint: (0.8, 0.8) if root.ids.previous_btn.state == 'normal' else (0.9, 0.9)
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        color: (0.9, 0.9, 0.9, 0.7) if root.ids.previous_btn.state == 'normal' else (1, 1, 1, 0.7)
                 Label:
                     id: select_month
                     text: root.today_text
@@ -238,24 +245,33 @@ WindowManager:
                     bold: True
                     pos_hint: {'center_y': 0.5}
                     font_size: dp(30)
-                Button:
-                    text: 'next'
-                    size_hint: (0.5,1)
-                    on_release: root.change_month(self.text)
+                RelativeLayout:
+                    Button:
+                        id: next_btn
+                        background_color: (0,0,0,0)
+                        background_normal: ''
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        size_hint: (0.4, 0.8)
+                        on_release: root.change_month('next')
+                    Image:
+                        source: 'images/next.png'
+                        size_hint: (0.8, 0.8) if root.ids.next_btn.state == 'normal' else (0.9, 0.9)
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        color: (0.9, 0.9, 0.9, 0.7) if root.ids.next_btn.state == 'normal' else (1, 1, 1, 0.7)
             ScrollView:
                 CalendarBox:
                     id: calendar_box
                     size_hint: (1, None)
                     height: 250 * root.days_in_month
                     #height: 7750
-            BottomBar:
-                Button:
-                    text: 'Back'
-                    size_hint: (None, None)
-                    size: ('70dp', '70dp')
-                    on_release:
-                        app.root.current = 'main'
-                        root.manager.transition.direction = 'right'
+            #BottomBar:
+            #    Button:
+            #        text: 'Back'
+            #        size_hint: (None, None)
+            #        size: ('70dp', '70dp')
+            #        on_release:
+            #            app.root.current = 'main'
+            #            root.manager.transition.direction = 'right'
 
 
 <SettingWindow>:
@@ -389,7 +405,7 @@ WindowManager:
                 rgba: (200/255, 200/255, 200/255, root.canvas_opacity_border)
             Line:
                 rounded_rectangle: (self.pos[0], self.pos[1], self.size[0], self.size[1], 20)
-                width: 4
+                width: 6
         Label:
             id: date
             font_name: 'fonts/korean1.ttf'
@@ -422,15 +438,6 @@ WindowManager:
     #background_color: (200/255, 200/255, 200/255, 0.4) if self.state == 'normal' else (200/255, 200/255, 200/255, 1)
     background_color: (1,0,0,0)
     background_normal: ''
-    #canvas.before:
-    #    Color:
-    #        id: canvas_color
-    #        #rgba: (200/255, 200/255, 200/255, 0.4) if self.state == 'normal' else (200/255, 200/255, 200/255, 1)
-    #        rgba: (200/255, 200/255, 200/255, 0.4) if (self.disabled == False and self.state == 'normal') else (200/255, 200/255, 200/255, 1) if (self.disabled == False and self.state == 'down') else (100/255, 100/255, 100/255, 0.8)
-    #    RoundedRectangle:
-    #        size: self.size
-    #        pos: self.pos
-    #        radius: [20]
 
 
 <AnswerWriteBox@Popup>:
