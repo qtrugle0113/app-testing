@@ -9,7 +9,7 @@ id,date,question,answer,mood,mood_value
 11,2023-02-26,Today you lost ……… .,ans3,negative,50
 12,2023-02-27,What's your favorite accessory?,ans3,sad,10
 13,2023-02-28,Where do you want to travel next?,fed ans4,happy,180
-117,2023-03-01,How much money do you have in your wallet?,ansasd2,happy,180
+117,2023-03-01,How much money do you have in your wallet?,ansasd2,happy,200
 118,2023-03-02,Are you emotional or logical?,ansdffas2,positive,122
 119,2023-03-03,If you could live someone else's life for one day who would it be?,ansasd2,sad,10
 120,2023-03-04,Who can you make happier? How?,ans2sss,sad,10
@@ -37,4 +37,4 @@ id,date,question,answer,mood,mood_value
 15,2023-03-27,Name one food you can cook with complete confidence?,ans1,sad,10
 231,2023-03-28,What is your favorite piece of clothing in your closet?,,positive,148
 157,2023-03-29,What was the last fruit you ate?,,happy,184
-13,2023-03-30,Where do you want to travel next?,debit,happy,164
+13,2023-03-30,Where do you want to travel next?,debit  noono 'jhkgfhfhgjghjghjghfjgh fghfg fg hfgh fgh fgh fg,positive,142

@@ -32,6 +32,7 @@ WindowManager:
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                     on_release:
                         app.root.current = 'qna'
+                        app.root.get_screen('qna').previous_screen = 'main'
                         root.manager.transition.direction = 'left'
 
                 Image:
@@ -143,19 +144,14 @@ WindowManager:
             font_name: 'fonts/korean1.ttf'
             size_hint: (0.8, 0.05)
             pos_hint: {'center_x': 0.5, 'center_y': 0.4}
-            on_release: Factory.AnswerWriteBox().open()
-        #Button:
-        #    text: 'Back'
-        #    size_hint: (None, None)
-        #    size: ('70dp', '70dp')
-        #    on_release:
-        #        app.root.current = 'main'
-        #        root.manager.transition.direction = 'right'
+            on_release:
+                Factory.AnswerWriteBox().open()
+                root.is_popup_open = True
         Button:
             text: '>> This question history <<'
             font_name: 'fonts/korean2'
             font_size: dp(20) if self.state == 'normal' else dp(23)
-            color: (1,1,1,1) if self.state == 'normal' else (215/255, 140/255, 220/255, 1)
+            color: (1,1,1,1) if self.state == 'normal' else (215/255, 160/255, 220/255, 1)
             background_color: (0,0,0,0)
             background_normal: ''
             size_hint: (0.65, 0.05)
@@ -169,6 +165,7 @@ WindowManager:
                     radius: [40]
             on_release:
                 app.root.current = 'ques_history'
+                app.root.get_screen('ques_history').previous_screen = 'qna'
                 root.manager.transition.direction = 'left'
                 app.root.get_screen('ques_history').last_answer(root.ques_id, root.question)
 
@@ -182,24 +179,28 @@ WindowManager:
             keep_ratio: False
             color: (1,1,1,0.5)
         Label:
+            id: ques_id_saver
+            color: (1, 1, 1, 0)
+
+        Label:
             text: "Your mood:"
             font_name: 'fonts/vintage1'
-            font_size: dp(25)
-            pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+            font_size: dp(30)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.3}
         Slider:
             id: last_mood_slider
             min: 0
             max: 200
             value_track: True
             value_track_color: [0.8, 0.1, 0.9, 0.4]
-            pos_hint: {'center_x': 0.5, 'center_y': 0.15}
+            pos_hint: {'center_x': 0.5, 'center_y': 0.25}
             size_hint: (0.8, 0.05)
             #value: root.mood_value
             disabled: True
         Image:
             id: last_mood
             #source: 'images/moods/normal.png' if root.mood == '' else 'images/moods/' + root.mood + '.png'
-            pos_hint: {'center_x': 0.5, 'center_y': 0.075}
+            pos_hint: {'center_x': 0.5, 'center_y': 0.175}
             #color: (1,1,1,0) if root.mood == '' else (1,1,1,1)
         QuestionChatBox:
             id: last_question
@@ -207,7 +208,6 @@ WindowManager:
             pos_hint: {'x': 0.05, 'center_y': 0.9}
             font_name: 'fonts/korean1.ttf'
             #text: root.question
-
             text_size: self.size
             halign: 'left'
             valign: 'middle'
@@ -226,6 +226,27 @@ WindowManager:
             font_size: dp(17)
             size_hint: (0.75, 0.05)
             color: (0, 0, 0)
+        Button:
+            text: '>> This question history <<'
+            font_name: 'fonts/korean2'
+            font_size: dp(20) if self.state == 'normal' else dp(23)
+            color: (1,1,1,1) if self.state == 'normal' else (215/255, 140/255, 220/255, 1)
+            background_color: (0,0,0,0)
+            background_normal: ''
+            size_hint: (0.65, 0.05)
+            pos_hint: {'center_x': 0.5, 'center_y':0.05}
+            canvas.before:
+                Color:
+                    rgba:(0.8, 0.8, 0.8, 0.2)
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [40]
+            on_release:
+                app.root.current = 'ques_history'
+                app.root.get_screen('ques_history').previous_screen = 'qna_history'
+                root.manager.transition.direction = 'left'
+                app.root.get_screen('ques_history').last_answer(root.ids.ques_id_saver.text, root.ids.last_question.text)
 
 
 <HistoryWindow>:
@@ -463,6 +484,7 @@ WindowManager:
         id: select_btn
         on_release:
             #app.root.current = 'qna_history'
+            app.root.get_screen('qna').previous_screen = 'history'
             app.root.get_screen('qna_history').manager.transition.direction = 'left'
             app.root.get_screen('qna_history').access_history(root.ids.date.text, root.ids.year_saver.text)
     Label:
@@ -560,6 +582,7 @@ WindowManager:
                 font_size: dp(15)
                 on_release:
                     root.dismiss()
+                    app.root.get_screen('qna').is_popup_open = False
             Button:
                 #size_hint: (0.1, 1)
                 #size: ('70dp', '70dp')
@@ -568,6 +591,7 @@ WindowManager:
                 font_size: dp(15)
                 on_release:
                     root.dismiss()
+                    app.root.get_screen('qna').is_popup_open = False
                     app.root.get_screen('qna').set_answer(answer_text.text)
                     app.root.get_screen('history').ids.calendar_box.update_data(app.root.get_screen('qna').question, app.root.get_screen('qna').mood)
 

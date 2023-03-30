@@ -8,9 +8,11 @@ import random
 import csv
 from kivy import Config
 from kivy.app import App
+from kivy.factory import Factory
 # from kivy.core.window import Window
 from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.popup import Popup
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 
@@ -82,16 +84,30 @@ class WindowManager(ScreenManager):
         if key == 27:  # the esc key
             if self.current_screen.name == "main":
                 return False  # exit the app from this page
-            elif self.current_screen.name == "qna":
+            elif self.current_screen.name == "qna" and App.get_running_app().root.get_screen('qna').is_popup_open:
+                return True  # keep screen and do not exit the app
+            elif self.current_screen.name == "qna" and App.get_running_app().root.get_screen(
+                    'qna').previous_screen == 'main':
                 self.current = "main"
+                self.transition.direction = 'right'
+                return True  # do not exit the app
+            elif self.current_screen.name == "qna" and App.get_running_app().root.get_screen(
+                    'qna').previous_screen == 'history':
+                self.current = "history"
                 self.transition.direction = 'right'
                 return True  # do not exit the app
             elif self.current_screen.name == "history":
                 self.current = "main"
                 self.transition.direction = 'right'
                 return True  # do not exit the app
-            elif self.current_screen.name == "ques_history":
+            elif self.current_screen.name == "ques_history" and App.get_running_app().root.get_screen(
+                    'ques_history').previous_screen == 'qna':
                 self.current = "qna"
+                self.transition.direction = 'right'
+                return True  # do not exit the app
+            elif self.current_screen.name == "ques_history" and App.get_running_app().root.get_screen(
+                    'ques_history').previous_screen == 'qna_history':
+                self.current = "qna_history"
                 self.transition.direction = 'right'
                 return True  # do not exit the app
             elif self.current_screen.name == "qna_history":
@@ -295,6 +311,9 @@ class CalendarBox(GridLayout):
 
 
 class QnAWindow(Screen):
+    previous_screen = 'main'
+    is_popup_open = False
+
     ques_id, question, answer, mood, mood_value = today_question()
     mood = StringProperty(mood)
     if mood_value == '':
@@ -371,11 +390,13 @@ class QnAWindow(Screen):
 
 
 class SelectQuestionHistory(RelativeLayout):
-    canvas_background_color = NumericProperty(200/255, rebind=True)
+    canvas_background_color = NumericProperty(200 / 255, rebind=True)
     canvas_background_alpha = NumericProperty(0.4, rebind=True)
 
 
 class QuestionHistory(Screen):
+    previous_screen = 'qna'
+
     def last_answer(self, ques_id, ques):
         self.ids.ques_his.text = ques
 
@@ -403,11 +424,11 @@ class QuestionHistory(Screen):
             if last_dates[j] != '':
                 self.ids[str(j)].ids.date.text = '{month}-{day}'.format(month=last_dates[j][5:7],
                                                                         day=last_dates[j][8:10])
-                self.ids[str(j)].canvas_background_color = 200/255
+                self.ids[str(j)].canvas_background_color = 200 / 255
                 self.ids[str(j)].canvas_background_alpha = 0.4
             else:
                 self.ids[str(j)].ids.date.text = ''
-                self.ids[str(j)].canvas_background_color = 100/255
+                self.ids[str(j)].canvas_background_color = 100 / 255
                 self.ids[str(j)].canvas_background_alpha = 0.8
             self.ids[str(j)].ids.answer.text = last_answers[j]
             if last_moods[j] == '':
@@ -418,14 +439,10 @@ class QuestionHistory(Screen):
 
 
 class QnAHistoryWindow(Screen):
-    '''mood = 'normal'
-    question = ''
-    answer = ''
-    mood_value = 0'''
-
     def access_history(self, select_date, select_year):
         day = "{year}-{month}-{day}".format(year=select_year, month=select_date[0:2], day=select_date[3:5])
         mood = 'normal'
+        ques_id = ''
         question = ''
         answer = ''
         mood_value = 100
@@ -438,12 +455,14 @@ class QnAHistoryWindow(Screen):
         # find qna data for day
         for i in range(len(answers)):
             if answers[i][1] == day:
+                ques_id = answers[i][0]
                 question = answers[i][2]
                 answer = answers[i][3]
                 mood = answers[i][4]
                 mood_value = answers[i][5]
                 break
 
+        self.ids.ques_id_saver.text = ques_id
         self.ids.last_question.text = question
         self.ids.last_answer.text = answer
         # if mood_value == '':
