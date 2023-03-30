@@ -3,6 +3,7 @@ WindowManager:
     MainWindow:
     QnAWindow:
     HistoryWindow:
+    QuestionHistory:
     QnAHistoryWindow:
     SettingWindow:
 #QnAWindow:
@@ -89,14 +90,14 @@ WindowManager:
             text: "Your mood today:"
             font_name: 'fonts/vintage1'
             font_size: dp(30)
-            pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+            pos_hint: {'center_x': 0.5, 'center_y': 0.3}
         Slider:
             id: mood_slider
             value_track: True
             value_track_color: [0.8, 0.1, 0.9, 0.4]
             min: 0
             max: 200
-            pos_hint: {'center_x': 0.5, 'center_y': 0.15}
+            pos_hint: {'center_x': 0.5, 'center_y': 0.25}
             size_hint: (0.8, 0.05)
             value: root.mood_value
             on_value: root.on_slider_value(self)
@@ -108,7 +109,7 @@ WindowManager:
             #size_hint: (None, None)
             #width: dp(70)
             #height: dp(70)
-            pos_hint: {'center_x': 0.5, 'center_y': 0.075}
+            pos_hint: {'center_x': 0.5, 'center_y': 0.175}
             color: (1,1,1,0) if root.mood == '' else (1,1,1,1)
 
         QuestionChatBox:
@@ -141,17 +142,35 @@ WindowManager:
             text: 'Type your answer...'
             font_name: 'fonts/korean1.ttf'
             size_hint: (0.8, 0.05)
-            pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+            pos_hint: {'center_x': 0.5, 'center_y': 0.4}
             on_release: Factory.AnswerWriteBox().open()
-
+        #Button:
+        #    text: 'Back'
+        #    size_hint: (None, None)
+        #    size: ('70dp', '70dp')
+        #    on_release:
+        #        app.root.current = 'main'
+        #        root.manager.transition.direction = 'right'
         Button:
-            text: 'Back'
-            size_hint: (None, None)
-            size: ('70dp', '70dp')
+            text: '>> This question history <<'
+            font_name: 'fonts/korean2'
+            font_size: dp(20) if self.state == 'normal' else dp(23)
+            color: (1,1,1,1) if self.state == 'normal' else (215/255, 140/255, 220/255, 1)
+            background_color: (0,0,0,0)
+            background_normal: ''
+            size_hint: (0.65, 0.05)
+            pos_hint: {'center_x': 0.5, 'center_y':0.05}
+            canvas.before:
+                Color:
+                    rgba:(0.8, 0.8, 0.8, 0.2)
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [40]
             on_release:
-                app.root.current = 'main'
-                root.manager.transition.direction = 'right'
-
+                app.root.current = 'ques_history'
+                root.manager.transition.direction = 'left'
+                app.root.get_screen('ques_history').last_answer(root.ques_id, root.question)
 
 <QnAHistoryWindow>:
     name: 'qna_history'
@@ -179,18 +198,16 @@ WindowManager:
             disabled: True
         Image:
             id: last_mood
-            source: 'images/moods/normal.png' if root.mood == '' else 'images/moods/' + root.mood + '.png'
-            #size_hint: (None, None)
-            #width: dp(70)
-            #height: dp(70)
+            #source: 'images/moods/normal.png' if root.mood == '' else 'images/moods/' + root.mood + '.png'
             pos_hint: {'center_x': 0.5, 'center_y': 0.075}
-            color: (1,1,1,0) if root.mood == '' else (1,1,1,1)
+            #color: (1,1,1,0) if root.mood == '' else (1,1,1,1)
         QuestionChatBox:
             id: last_question
             padding: (10, 0)
             pos_hint: {'x': 0.05, 'center_y': 0.9}
             font_name: 'fonts/korean1.ttf'
-            text: root.question
+            #text: root.question
+
             text_size: self.size
             halign: 'left'
             valign: 'middle'
@@ -201,7 +218,7 @@ WindowManager:
             id:last_answer
             padding: (10, 0)
             pos_hint: {'right': 0.95, 'center_y': 0.7}
-            text: root.answer
+            #text: root.answer
             text_size: self.size
             font_name: 'fonts/korean1.ttf'
             halign: 'left'
@@ -240,11 +257,12 @@ WindowManager:
                 Label:
                     id: select_month
                     text: root.today_text
-                    font_name: 'fonts/kosan'
+                    font_name: 'fonts/korean2'
+                    bold: True
                     color: (0,0,0)
                     bold: True
                     pos_hint: {'center_y': 0.5}
-                    font_size: dp(30)
+                    font_size: dp(40)
                 RelativeLayout:
                     Button:
                         id: next_btn
@@ -259,20 +277,83 @@ WindowManager:
                         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                         color: (0.9, 0.9, 0.9, 0.7) if root.ids.next_btn.state == 'normal' else (1, 1, 1, 0.7)
             ScrollView:
+                id: scroll_box
+                scroll_y: root.scroll_view_pos
                 CalendarBox:
                     id: calendar_box
                     size_hint: (1, None)
                     height: 250 * root.days_in_month
                     #height: 7750
-            #BottomBar:
-            #    Button:
-            #        text: 'Back'
-            #        size_hint: (None, None)
-            #        size: ('70dp', '70dp')
-            #        on_release:
-            #            app.root.current = 'main'
-            #            root.manager.transition.direction = 'right'
 
+
+<QuestionHistory>:
+    name: 'ques_history'
+
+    RelativeLayout:
+        Image:
+            source: 'images/pink.jpg'
+            allow_stretch: True
+            keep_ratio: False
+            color: (1,1,1,0.5)
+        BoxLayout:
+            orientation: 'vertical'
+            TopBar:
+                Label:
+                    text: 'This Question Last 5 Times'
+                    font_name: 'fonts/korean2'
+                    bold: True
+                    color: (0,0,0)
+                    bold: True
+                    pos_hint: {'center_y': 0.5}
+                    font_size: dp(30)
+            BoxLayout:
+                padding: (0,25,0,25)
+                spacing: dp(20)
+                orientation: 'vertical'
+                Label:
+                    id: ques_his
+                    font_name: 'fonts/korean1'
+                    font_size: dp(18)
+                    color: (0, 0, 0, 1)
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'middle'
+                    padding_x: 15
+                    size_hint: (0.9, 0.7)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    canvas.before:
+                        Color:
+                            rgba: (200/255, 200/255, 200/255, 0.5)
+                        RoundedRectangle:
+                            size: self.size
+                            pos: self.pos
+                            radius: [20]
+                Label:
+                    text: 'Your answer:'
+                    font_name: 'fonts/korean1'
+                    font_size: dp(20)
+                    size_hint: (1,0.4)
+                    canvas.before:
+                        Color:
+                            rgba: (0.3, 0.3, 0.3, 0.5)
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos
+                SelectQuestionHistory:
+                    id: 0
+                    size_hint: (1, 1)
+                SelectQuestionHistory:
+                    id: 1
+                    size_hint: (1, 1)
+                SelectQuestionHistory:
+                    id: 2
+                    size_hint: (1, 1)
+                SelectQuestionHistory:
+                    id: 3
+                    size_hint: (1, 1)
+                SelectQuestionHistory:
+                    id: 4
+                    size_hint: (1, 1)
 
 <SettingWindow>:
     name: 'setting'
@@ -364,13 +445,6 @@ WindowManager:
 <CalendarBox>:
     padding: (0,10,0,10)
     spacing: dp(5)
-    canvas.before:
-        Color:
-            rgba: (240/255, 0/255, 0/255, 0)
-        RoundedRectangle:
-            size: self.size
-            pos: self.pos
-            radius: [10,10,10,10]
 
 <BottomBar@BoxLayout>:
     size_hint: (1, 0.08)
@@ -390,13 +464,21 @@ WindowManager:
         on_release:
             #app.root.current = 'qna_history'
             app.root.get_screen('qna_history').manager.transition.direction = 'left'
-            app.root.get_screen('qna_history').access_history(root.ids.date.text)
+            app.root.get_screen('qna_history').access_history(root.ids.date.text, root.ids.year_saver.text)
+    Label:
+        id: year_saver
+        color: (1, 1, 1, 0)
     BoxLayout:
         padding: ['5dp', 0, '5dp',0]
         spacing: dp(7)
         canvas.before:
             Color:
-                rgba: (200/255, 200/255, 200/255, root.canvas_opacity_button) if (root.ids.select_btn.disabled == False and root.ids.select_btn.state == 'normal') else (200/255, 200/255, 200/255, root.canvas_opacity_button * 2.5) if (root.ids.select_btn.disabled == False and root.ids.select_btn.state == 'down') else (100/255, 100/255, 100/255, root.canvas_opacity_button * 2)
+                rgba:
+                    (200/255, 200/255, 200/255, root.canvas_opacity_button) if \
+                    (root.ids.select_btn.disabled == False and root.ids.select_btn.state == 'normal') else \
+                    (200/255, 200/255, 200/255, root.canvas_opacity_button * 2.5) if \
+                    (root.ids.select_btn.disabled == False and root.ids.select_btn.state == 'down') else \
+                    (100/255, 100/255, 100/255, root.canvas_opacity_button * 2)
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
@@ -425,6 +507,7 @@ WindowManager:
         Image:
             id: mood
             size_hint: (0.15 , 1)
+            #color: (1, 1, 1, 0)
             canvas.before:
                 Color:
                     rgba: (0.3, 0.3, 0.3, root.canvas_opacity_line)
@@ -487,3 +570,40 @@ WindowManager:
                     root.dismiss()
                     app.root.get_screen('qna').set_answer(answer_text.text)
                     app.root.get_screen('history').ids.calendar_box.update_data(app.root.get_screen('qna').question, app.root.get_screen('qna').mood)
+
+<SelectQuestionHistory>:
+    BoxLayout:
+        padding: ['5dp', 0, '5dp',0]
+        spacing: dp(7)
+        canvas.before:
+            Color:
+                rgba:(root.canvas_background_color, root.canvas_background_color, root.canvas_background_color, root.canvas_background_alpha)
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: [20]
+        Label:
+            id: date
+            font_name: 'fonts/korean1.ttf'
+            size_hint: (0.2 , 1)
+            canvas.before:
+                Color:
+                    rgba: (0.3, 0.3, 0.3, 1)
+                Line:
+                    points: (self.size[0], 0 + 10, self.size[0], self.size[1] - 10)
+                    width: 2
+        Label:
+            id: answer
+            font_name: 'fonts/korean1.ttf'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+        Image:
+            id: mood
+            size_hint: (0.15 , 1)
+            canvas.before:
+                Color:
+                    rgba: (0.3, 0.3, 0.3, 1)
+                Line:
+                    points: (self.pos[0] - dp(5), 0 + 10, self.pos[0] - dp(5), self.size[1] - 10)
+                    width: 2

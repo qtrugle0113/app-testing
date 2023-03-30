@@ -45,13 +45,13 @@ def today_question():
             return ques_id, today_ques, today_ans, today_mood, mood_value
 
     # if not created, randomly pick a question from questions list
-    ques_id = random.randint(1, len(questions) - 1)
+    ques_id = str(random.randint(1, len(questions) - 1))
     # prevent the same question will be created within 60days
     while True:
         diff_days = 9999  # the days between 2 same questions if they are created, initially set as a large number
         for row in range(len(answers) - 1):
-            # backward loop, not execute label row
-            if int(answers[len(answers) - row - 1][0]) == ques_id:  # check random created question is exist
+            # backward loop, '-1' means not execute label row
+            if answers[len(answers) - row - 1][0] == ques_id:  # check random created question is exist
                 date_before = datetime.strptime(answers[len(answers) - row - 1][1], '%Y-%m-%d')
                 date_now = datetime.strptime(str(today), '%Y-%m-%d')
                 diff_days = (date_now - date_before).days
@@ -59,10 +59,10 @@ def today_question():
 
         if diff_days > 60:  # within 60 days, the same question will not be created
             break  # while loop break
-        # try to random a another question
-        ques_id = random.randint(1, len(questions) - 1)
+        # try to random another question
+        ques_id = str(random.randint(1, len(questions) - 1))
 
-    today_ques = questions[ques_id][2]
+    today_ques = questions[int(ques_id)][2]
     today_ans = ''
     today_mood = ''
     mood_value = ''
@@ -90,6 +90,10 @@ class WindowManager(ScreenManager):
                 self.current = "main"
                 self.transition.direction = 'right'
                 return True  # do not exit the app
+            elif self.current_screen.name == "ques_history":
+                self.current = "qna"
+                self.transition.direction = 'right'
+                return True  # do not exit the app
             elif self.current_screen.name == "qna_history":
                 self.current = "history"
                 self.transition.direction = 'right'
@@ -109,8 +113,10 @@ class HistoryWindow(Screen):
     year = today.year
     month = today.month
     day = today.day
-
     days_in_month = monthrange(year, month)[1]
+    # set position for the scroll calendar box: 1 is top, 0 is bottom
+    # scroll_view_pos = 1 - day/days_in_month
+    scroll_view_pos = 1
 
     months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
               7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
@@ -140,6 +146,7 @@ class HistoryWindow(Screen):
         # resize scroll screen
         self.ids.calendar_box.height = 250 * self.days_in_month
         self.ids.calendar_box.change_calendar(self.month, self.year)
+        self.ids.scroll_box.scroll_y = 1
         print(self.month, self.year)
 
 
@@ -162,6 +169,7 @@ class CalendarBox(GridLayout):
                 self.ids[i + 1].size_hint = (0, 0)
                 self.ids[i + 1].ids.date.text = ''
                 self.ids[i + 1].ids.question.text = ''
+                self.ids[i + 1].ids.year_saver.text = ''
                 self.ids[i + 1].ids.select_btn.disabled = True
                 self.ids[i + 1].ids.mood.color = (1, 1, 1, 0)
                 self.ids[i + 1].canvas_opacity_line = 0
@@ -171,6 +179,7 @@ class CalendarBox(GridLayout):
 
             self.ids[day.day].size_hint = (1, 0.25)
             self.ids[day.day].ids.date.text = day.strftime('%m/%d')
+            self.ids[day.day].ids.year_saver.text = day.strftime('%Y')
             answers = []
 
             with open('user/answers_list.csv', 'r') as file:
@@ -236,6 +245,7 @@ class CalendarBox(GridLayout):
             self.add_widget(b)
             b.size_hint = (1, 0.25)
             b.ids.date.text = day.strftime('%m/%d')
+            b.ids.year_saver.text = day.strftime('%Y')
 
             answers = []
 
@@ -360,14 +370,65 @@ class QnAWindow(Screen):
                         [self.ques_id, str(self.today), self.question, self.answer, self.mood, int(self.mood_value)])
 
 
+class SelectQuestionHistory(RelativeLayout):
+    canvas_background_color = NumericProperty(200/255, rebind=True)
+    canvas_background_alpha = NumericProperty(0.4, rebind=True)
+
+
+class QuestionHistory(Screen):
+    def last_answer(self, ques_id, ques):
+        self.ids.ques_his.text = ques
+
+        last_dates = ['', '', '', '', '']
+        last_answers = ['', '', '', '', '']
+        last_moods = ['', '', '', '', '']
+        filled = 0
+        answers = []
+        with open('user/answers_list.csv', 'r') as file:
+            answers_list = csv.reader(file)
+            for row in answers_list:
+                answers.append(row)
+
+        for i in range(len(answers) - 1):  # '-1' means not execute label row
+            if answers[len(answers) - i - 1][0] == ques_id:
+                last_dates[filled] = answers[len(answers) - i - 1][1]
+                last_answers[filled] = answers[len(answers) - i - 1][3]
+                last_moods[filled] = answers[len(answers) - i - 1][4]
+                if filled >= 4:
+                    break
+                else:
+                    filled += 1
+        print(last_dates[0])
+        for j in range(5):
+            if last_dates[j] != '':
+                self.ids[str(j)].ids.date.text = '{month}-{day}'.format(month=last_dates[j][5:7],
+                                                                        day=last_dates[j][8:10])
+                self.ids[str(j)].canvas_background_color = 200/255
+                self.ids[str(j)].canvas_background_alpha = 0.4
+            else:
+                self.ids[str(j)].ids.date.text = ''
+                self.ids[str(j)].canvas_background_color = 100/255
+                self.ids[str(j)].canvas_background_alpha = 0.8
+            self.ids[str(j)].ids.answer.text = last_answers[j]
+            if last_moods[j] == '':
+                self.ids[str(j)].ids.mood.source = 'images/moods/normal.png'
+                self.ids[str(j)].ids.mood.color = (1, 1, 1, 0)
+            else:
+                self.ids[str(j)].ids.mood.source = 'images/moods/' + last_moods[j] + '.png'
+
+
 class QnAHistoryWindow(Screen):
-    mood = 'normal'
+    '''mood = 'normal'
     question = ''
     answer = ''
-    mood_value = 0
+    mood_value = 0'''
 
-    def access_history(self, select_date):
-        day = "2023-{month}-{day}".format(month=select_date[0:2], day=select_date[3:5])
+    def access_history(self, select_date, select_year):
+        day = "{year}-{month}-{day}".format(year=select_year, month=select_date[0:2], day=select_date[3:5])
+        mood = 'normal'
+        question = ''
+        answer = ''
+        mood_value = 100
         # load answers list data
         answers = []
         with open('user/answers_list.csv', 'r') as file:
@@ -377,23 +438,23 @@ class QnAHistoryWindow(Screen):
         # find qna data for day
         for i in range(len(answers)):
             if answers[i][1] == day:
-                self.question = answers[i][2]
-                self.answer = answers[i][3]
-                self.mood = answers[i][4]
-                self.mood_value = answers[i][5]
+                question = answers[i][2]
+                answer = answers[i][3]
+                mood = answers[i][4]
+                mood_value = answers[i][5]
                 break
 
-        self.ids.last_question.text = self.question
-        self.ids.last_answer.text = self.answer
-        if self.mood_value == '':
-            self.mood_value = 100
-        self.ids.last_mood_slider.value = self.mood_value
-        if self.mood == '':
+        self.ids.last_question.text = question
+        self.ids.last_answer.text = answer
+        # if mood_value == '':
+        #    mood_value = 100
+        self.ids.last_mood_slider.value = mood_value
+        if mood == '':
             self.ids.last_mood.source = 'images/moods/normal.png'
             self.ids.last_mood.color = (1, 1, 1, 0)
             self.ids.last_mood_slider.value_track_color = [0.8, 0.1, 0.9, 0]
         else:
-            self.ids.last_mood.source = 'images/moods/' + self.mood + '.png'
+            self.ids.last_mood.source = 'images/moods/' + mood + '.png'
             self.ids.last_mood.color = (1, 1, 1, 1)
             self.ids.last_mood_slider.value_track_color = [0.8, 0.1, 0.9, 0.4]
 

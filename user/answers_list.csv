@@ -1,4 +1,6 @@
 id,date,question,answer,mood,mood_value
+125,2022-03-01,When was the last time you went swimming?,ansasdasd2,sad,10
+125,2022-12-01,When was the last time you went swimming?,ansasdasd2,sad,10
 123,2023-02-18,Are you messy or neat?,ans2,sad,2
 124,2023-02-19,"If you could have superpower just for today, what would it be?",ans2 sdks sdfdsf,sad,3
 125,2023-02-20,When was the last time you went swimming?,ansasd2,happy,190
@@ -20,7 +22,7 @@ id,date,question,answer,mood,mood_value
 10,2023-03-11,Who gave you life-changing advice?,ans2,sad,10
 11,2023-03-12,Today you lost ……… .,ans3,negative,60
 12,2023-03-13,What's your favorite accessory?,ans3,sad,10
-13,2023-03-14,Where do you want to travel next?,ans4,,100
+13,2023-03-14,Where do you want to travel next?,lonnnn,sad,1
 14,2023-03-16,Are you a leader or a follower?,ans5,positive,150
 15,2023-03-17,Name one food you can cook with complete confidence?,,,
 16,2023-03-18,Do you owe someone money? Does someone owe you?,ans4,happy,190
@@ -35,4 +37,4 @@ id,date,question,answer,mood,mood_value
 15,2023-03-27,Name one food you can cook with complete confidence?,ans1,sad,10
 231,2023-03-28,What is your favorite piece of clothing in your closet?,,positive,148
 157,2023-03-29,What was the last fruit you ate?,,happy,184
-316,2023-03-30,What do you aways avoid?,0923434,normal,114
+13,2023-03-30,Where do you want to travel next?,debit,happy,164
