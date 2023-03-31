@@ -491,8 +491,8 @@ class QnAHistoryWindow(Screen):
         self.ids.ques_id_saver.text = ques_id
         self.ids.last_question.text = question
         self.ids.last_answer.text = answer
-        # if mood_value == '':
-        #    mood_value = 100
+        if mood_value == '':
+            mood_value = 100
         self.ids.last_mood_slider.value = mood_value
         if mood == '':
             self.ids.last_mood.source = 'images/moods/normal.png'
@@ -572,21 +572,21 @@ class RunApp(App):
 
     # init_audio
     # Background music:
-    background_music = SoundLoader.load('audio/background(Lesfm).mp3')
+    background_music = SoundLoader.load('audio/background(Lesfm).wav')
     background_music.volume = 1 * music
     background_music.loop = True
     # Affect sound:
     # only play in QnA Screen
-    wave_sound = SoundLoader.load('audio/wave_sound(DennisH18).mp3')
+    wave_sound = SoundLoader.load('audio/wave_sound(DennisH18).wav')
     wave_sound.volume = 0.25 * music
     wave_sound.loop = True
     # play when switching screens
-    switch_screen1 = SoundLoader.load('audio/switch_sound1.mp3')
-    switch_screen2 = SoundLoader.load('audio/switch_sound2.mp3')
+    switch_screen1 = SoundLoader.load('audio/switch_sound1.wav')
+    switch_screen2 = SoundLoader.load('audio/switch_sound2.wav')
     switch_screen1.volume = 1 * sound
     switch_screen2.volume = 1 * sound
     # play when click button
-    click = SoundLoader.load('audio/click(UNIVERSFIELD).mp3')
+    click = SoundLoader.load('audio/click(UNIVERSFIELD).wav')
     click.volume = 0.5 * sound
 
     background_music.play()
