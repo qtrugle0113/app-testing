@@ -34,8 +34,7 @@ WindowManager:
                         app.root.current = 'qna'
                         app.root.get_screen('qna').previous_screen = 'main'
                         root.manager.transition.direction = 'left'
-                        app.switch_screen1.play()
-                        app.wave_sound.play()
+                        app.switch_screen.play()
 
                 Image:
                     source: 'images/color_stain.png'
@@ -70,7 +69,7 @@ WindowManager:
                 on_release:
                     app.root.current = 'history'
                     root.manager.transition.direction = 'left'
-                    app.switch_screen1.play()
+                    app.switch_screen.play()
 
             OptionButton:
                 text: 'Setting'
@@ -79,7 +78,7 @@ WindowManager:
                 on_release:
                     app.root.current = 'setting'
                     root.manager.transition.direction = 'left'
-                    app.switch_screen1.play()
+                    app.switch_screen.play()
 
 <QnAWindow>:
     name: 'qna'
@@ -173,7 +172,7 @@ WindowManager:
                 app.root.get_screen('ques_history').previous_screen = 'qna'
                 root.manager.transition.direction = 'left'
                 app.root.get_screen('ques_history').last_answer(root.ques_id, root.question)
-                app.switch_screen1.play()
+                app.switch_screen.play()
 
 <QnAHistoryWindow>:
     name: 'qna_history'
@@ -253,7 +252,7 @@ WindowManager:
                 app.root.get_screen('ques_history').previous_screen = 'qna_history'
                 root.manager.transition.direction = 'left'
                 app.root.get_screen('ques_history').last_answer(root.ids.ques_id_saver.text, root.ids.last_question.text)
-                app.switch_screen1.play()
+                app.switch_screen.play()
 
 
 <HistoryWindow>:
@@ -580,7 +579,7 @@ WindowManager:
             app.root.get_screen('qna').previous_screen = 'history'
             app.root.get_screen('qna_history').manager.transition.direction = 'left'
             app.root.get_screen('qna_history').access_history(root.ids.date.text, root.ids.year_saver.text)
-            app.switch_screen1.play()
+            app.switch_screen.play()
     Label:
         id: year_saver
         color: (1, 1, 1, 0)

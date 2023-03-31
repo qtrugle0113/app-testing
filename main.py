@@ -91,42 +91,40 @@ class WindowManager(ScreenManager):
                     'qna').previous_screen == 'main':
                 self.current = "main"
                 self.transition.direction = 'right'
-                App.get_running_app().wave_sound.stop()
-                App.get_running_app().switch_screen2.play()
+                App.get_running_app().switch_screen.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "qna" and App.get_running_app().root.get_screen(
                     'qna').previous_screen == 'history':
                 self.current = "history"
                 self.transition.direction = 'right'
-                App.get_running_app().wave_sound.stop()
-                App.get_running_app().switch_screen2.play()
+                App.get_running_app().switch_screen.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "history":
                 self.current = "main"
                 self.transition.direction = 'right'
-                App.get_running_app().switch_screen2.play()
+                App.get_running_app().switch_screen.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "ques_history" and App.get_running_app().root.get_screen(
                     'ques_history').previous_screen == 'qna':
                 self.current = "qna"
                 self.transition.direction = 'right'
-                App.get_running_app().switch_screen2.play()
+                App.get_running_app().switch_screen.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "ques_history" and App.get_running_app().root.get_screen(
                     'ques_history').previous_screen == 'qna_history':
                 self.current = "qna_history"
                 self.transition.direction = 'right'
-                App.get_running_app().switch_screen2.play()
+                App.get_running_app().switch_screen.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "qna_history":
                 self.current = "history"
                 self.transition.direction = 'right'
-                App.get_running_app().switch_screen2.play()
+                App.get_running_app().switch_screen.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "setting":
                 self.current = "main"
                 self.transition.direction = 'right'
-                App.get_running_app().switch_screen2.play()
+                App.get_running_app().switch_screen.play()
                 return True  # do not exit the app
 
 
@@ -251,7 +249,6 @@ class CalendarBox(GridLayout):
                 self.ids[day.day].canvas_opacity_border = 1
                 self.ids[day.day].ids.select_btn.bind(
                     on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
-                self.ids[day.day].ids.select_btn.bind(on_release=lambda *args: App.get_running_app().wave_sound.play())
             else:
                 self.ids[day.day].canvas_opacity_border = 0
                 self.ids[day.day].ids.select_btn.bind(
@@ -316,7 +313,6 @@ class CalendarBox(GridLayout):
             if day == self.today:
                 b.canvas_opacity_border = 1
                 b.ids.select_btn.bind(on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
-                b.ids.select_btn.bind(on_release=lambda *args: App.get_running_app().wave_sound.play())
             else:
                 b.ids.select_btn.bind(
                     on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
@@ -509,7 +505,6 @@ class SettingWindow(Screen):
         if widget.active:
             # turn on/off music by switch value
             App.get_running_app().background_music.volume = 1
-            App.get_running_app().wave_sound.volume = 0.25
             # save into setting file
             settings = None
             with open('setting.csv', 'r', newline='') as file:
@@ -521,7 +516,6 @@ class SettingWindow(Screen):
                 setting.writerow([settings[0], 'on', settings[2]])
         else:
             App.get_running_app().background_music.volume = 0
-            App.get_running_app().wave_sound.volume = 0
             settings = None
             with open('setting.csv', 'r', newline='') as file:
                 setting = csv.reader(file)
@@ -534,8 +528,7 @@ class SettingWindow(Screen):
     def sound_setting(self, widget):
         if widget.active:
             # turn on/off effect sound by switch value
-            App.get_running_app().switch_screen1.volume = 1
-            App.get_running_app().switch_screen2.volume = 1
+            App.get_running_app().switch_screen.volume = 1
             App.get_running_app().click.volume = 0.5
             # save into setting file
             settings = None
@@ -547,8 +540,7 @@ class SettingWindow(Screen):
                 setting = csv.writer(file)
                 setting.writerow([settings[0], settings[1], 'on'])
         else:
-            App.get_running_app().switch_screen1.volume = 0
-            App.get_running_app().switch_screen2.volume = 0
+            App.get_running_app().switch_screen.volume = 0
             App.get_running_app().click.volume = 0
             settings = None
             with open('setting.csv', 'r', newline='') as file:
@@ -572,21 +564,15 @@ class RunApp(App):
 
     # init_audio
     # Background music:
-    background_music = SoundLoader.load('audio/background(Lesfm).wav')
+    background_music = SoundLoader.load('audio/background.mp3')
     background_music.volume = 1 * music
     background_music.loop = True
     # Affect sound:
-    # only play in QnA Screen
-    wave_sound = SoundLoader.load('audio/wave_sound(DennisH18).wav')
-    wave_sound.volume = 0.25 * music
-    wave_sound.loop = True
     # play when switching screens
-    switch_screen1 = SoundLoader.load('audio/switch_sound1.wav')
-    switch_screen2 = SoundLoader.load('audio/switch_sound2.wav')
-    switch_screen1.volume = 1 * sound
-    switch_screen2.volume = 1 * sound
+    switch_screen = SoundLoader.load('audio/switch_sound.mp3')
+    switch_screen.volume = 1 * sound
     # play when click button
-    click = SoundLoader.load('audio/click(UNIVERSFIELD).wav')
+    click = SoundLoader.load('audio/click(UNIVERSFIELD).mp3')
     click.volume = 0.5 * sound
 
     background_music.play()
