@@ -213,6 +213,7 @@ WindowManager:
 
 <HistoryWindow>:
     name: 'history'
+    id: history
 
     RelativeLayout:
         Image:
@@ -223,18 +224,30 @@ WindowManager:
         BoxLayout:
             orientation: 'vertical'
             TopBar:
+                Button:
+                    text: 'previous'
+                    size_hint: (0.5,1)
+                    on_release:
+                        root.change_month(self.text)
+                        #root.ids.calendar_box.test_change()
                 Label:
+                    id: select_month
                     text: root.today_text
                     font_name: 'fonts/kosan'
                     color: (0,0,0)
                     bold: True
                     pos_hint: {'center_y': 0.5}
                     font_size: dp(30)
+                Button:
+                    text: 'next'
+                    size_hint: (0.5,1)
+                    on_release: root.change_month(self.text)
             ScrollView:
                 CalendarBox:
                     id: calendar_box
                     size_hint: (1, None)
                     height: 250 * root.days_in_month
+                    #height: 7750
             BottomBar:
                 Button:
                     text: 'Back'
@@ -363,24 +376,27 @@ WindowManager:
             app.root.get_screen('qna_history').manager.transition.direction = 'left'
             app.root.get_screen('qna_history').access_history(root.ids.date.text)
     BoxLayout:
-        id: cbox
         padding: ['5dp', 0, '5dp',0]
         spacing: dp(7)
         canvas.before:
             Color:
-                id: canvas_color
-                rgba: (200/255, 200/255, 200/255, 0.4) if (root.ids.select_btn.disabled == False and root.ids.select_btn.state == 'normal') else (200/255, 200/255, 200/255, 1) if (root.ids.select_btn.disabled == False and root.ids.select_btn.state == 'down') else (100/255, 100/255, 100/255, 0.8)
+                rgba: (200/255, 200/255, 200/255, root.canvas_opacity_button) if (root.ids.select_btn.disabled == False and root.ids.select_btn.state == 'normal') else (200/255, 200/255, 200/255, root.canvas_opacity_button * 2.5) if (root.ids.select_btn.disabled == False and root.ids.select_btn.state == 'down') else (100/255, 100/255, 100/255, root.canvas_opacity_button * 2)
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
                 radius: [20]
+            Color:
+                rgba: (200/255, 200/255, 200/255, root.canvas_opacity_border)
+            Line:
+                rounded_rectangle: (self.pos[0], self.pos[1], self.size[0], self.size[1], 20)
+                width: 4
         Label:
             id: date
             font_name: 'fonts/korean1.ttf'
             size_hint: (0.2 , 1)
             canvas.before:
                 Color:
-                    rgba: (0.3, 0.3, 0.3, 1)
+                    rgba: (0.3, 0.3, 0.3, root.canvas_opacity_line)
                 Line:
                     points: (self.size[0], 0 + 10, self.size[0], self.size[1] - 10)
                     width: 2
@@ -395,7 +411,7 @@ WindowManager:
             size_hint: (0.15 , 1)
             canvas.before:
                 Color:
-                    rgba: (0.3, 0.3, 0.3, 1)
+                    rgba: (0.3, 0.3, 0.3, root.canvas_opacity_line)
                 Line:
                     points: (self.pos[0] - dp(5), 0 + 10, self.pos[0] - dp(5), self.size[1] - 10)
                     width: 2

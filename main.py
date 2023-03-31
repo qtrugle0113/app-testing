@@ -9,7 +9,7 @@ import csv
 from kivy import Config
 from kivy.app import App
 # from kivy.core.window import Window
-from kivy.properties import StringProperty
+from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
@@ -34,8 +34,9 @@ def today_question():
         for row in answers_list:
             answers.append(row)
 
+    today = date.today()
     for i in range(len(answers)):
-        if answers[i][1] == str(date.today()):
+        if answers[i][1] == str(today):
             ques_id = answers[i][0]
             today_ques = answers[i][2]
             today_ans = answers[i][3]
@@ -52,7 +53,7 @@ def today_question():
             # backward loop, not execute label row
             if int(answers[len(answers) - row - 1][0]) == ques_id:  # check random created question is exist
                 date_before = datetime.strptime(answers[len(answers) - row - 1][1], '%Y-%m-%d')
-                date_now = datetime.strptime(str(date.today()), '%Y-%m-%d')
+                date_now = datetime.strptime(str(today), '%Y-%m-%d')
                 diff_days = (date_now - date_before).days
                 break  # for loop break
 
@@ -68,7 +69,7 @@ def today_question():
     # save question to answers list
     with open('user/answers_list.csv', 'a', newline='') as file:
         answers_list = csv.writer(file)
-        answers_list.writerow([ques_id, str(date.today()), today_ques, today_ans, today_mood, mood_value])
+        answers_list.writerow([ques_id, str(today), today_ques, today_ans, today_mood, mood_value])
     return ques_id, today_ques, today_ans, today_mood, mood_value
 
 
@@ -111,48 +112,138 @@ class HistoryWindow(Screen):
 
     days_in_month = monthrange(year, month)[1]
 
-    if month == 1:
-        month_name = 'January'
-    elif month == 2:
-        month_name = 'February'
-    elif month == 3:
-        month_name = 'March'
-    elif month == 4:
-        month_name = 'April'
-    elif month == 5:
-        month_name = 'May'
-    elif month == 6:
-        month_name = 'June'
-    elif month == 7:
-        month_name = 'July'
-    elif month == 8:
-        month_name = 'August'
-    elif month == 9:
-        month_name = 'September'
-    elif month == 10:
-        month_name = 'October'
-    elif month == 11:
-        month_name = 'November'
-    else:
-        month_name = 'December'
+    months = {
+        1: 'January',
+        2: 'February',
+        3: 'March',
+        4: 'April',
+        5: 'May',
+        6: 'June',
+        7: 'July',
+        8: 'August',
+        9: 'September',
+        10: 'October',
+        11: 'November',
+        12: 'December'
+    }
 
-    today_text = month_name + ' ' + str(year)
+    today_text = months[month] + ' ' + str(year)
+
+    def change_month(self, action):
+        if action == 'previous':
+            if self.month == 1:
+                self.month = 12
+                self.year = self.year - 1
+            else:
+                self.month = self.month - 1
+        else:
+            if self.month == 12:
+                self.month = 1
+                self.year = self.year + 1
+            else:
+                self.month = self.month + 1
+
+        self.today_text = self.months[self.month] + ' ' + str(self.year)
+        self.ids.select_month.text = self.today_text
+        self.days_in_month = monthrange(self.year, self.month)[1]
+        # resize scroll screen
+        self.ids.calendar_box.height = 250 * self.days_in_month
+        self.ids.calendar_box.change_calendar(self.month, self.year)
+        print(self.month, self.year)
+
 
 
 class SelectDayLayout(RelativeLayout):
-    pass
+    canvas_opacity_line = NumericProperty(1, rebind=True)
+    canvas_opacity_button = NumericProperty(0.4, rebind=True)
+    canvas_opacity_border = NumericProperty(0, rebind=True)
 
 
 class CalendarBox(GridLayout):
     cols = 1
     today = date.today()
 
+    def change_calendar(self, new_month, new_year):
+        for i in range(31):
+        #for i in range(monthrange(new_year, new_month)[1]):
+            day = self.today.replace(year=new_year, month=new_month, day=1) + timedelta(days=i)
+
+            if i >= monthrange(new_year, new_month)[1]:
+                self.ids[i + 1].size_hint = (0, 0)
+                self.ids[i + 1].ids.date.text = ''
+                self.ids[i + 1].ids.question.text = ''
+                self.ids[i + 1].ids.mood.color = (1, 1, 1, 0)
+                self.ids[i + 1].canvas_opacity_line = 0
+                self.ids[i + 1].canvas_opacity_button = 0
+                self.ids[i + 1].canvas_opacity_border = 0
+                continue
+
+            self.ids[day.day].canvas_opacity_line = 1
+            self.ids[day.day].canvas_opacity_button = 0.4
+            #self.ids[day.day].canvas_opacity_border = 0
+
+            self.ids[day.day].size_hint = (1, 0.25)
+            self.ids[day.day].ids.date.text = day.strftime('%m/%d')
+            #self.ids[day.day].ids.date.text = 'ok'
+            answers = []
+
+            with open('user/answers_list.csv', 'r') as file:
+                answers_list = csv.reader(file)
+                for row in answers_list:
+                    answers.append(row)
+
+            question = ''
+            answer = ''
+            mood = ''
+
+            for j in range(len(answers)):
+                if answers[j][1] == str(day):
+                    question = answers[j][2]
+                    answer = answers[j][3]
+                    mood = answers[j][4]
+                    break
+
+            self.ids[day.day].ids.question.text = question
+            if mood == '':
+                self.ids[day.day].ids.mood.source = 'images/moods/normal.png'
+                self.ids[day.day].ids.mood.color = (1, 1, 1, 0)
+            else:
+                self.ids[day.day].ids.mood.source = 'images/moods/' + mood + '.png'
+                self.ids[day.day].ids.mood.color = (1, 1, 1, 1)
+
+            if day != self.today and (question == '' or (answer == '' and mood == '')):
+                self.ids[day.day].ids.select_btn.disabled = True
+            else:
+                self.ids[day.day].ids.select_btn.disabled = False
+            # Move to QnA Screen if select date is today
+            if day == self.today:
+                self.ids[day.day].canvas_opacity_border = 1
+                self.ids[day.day].ids.select_btn.bind(on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
+            else:
+                self.ids[day.day].canvas_opacity_border = 0
+                self.ids[day.day].ids.select_btn.bind(
+                    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
+
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        for i in range(monthrange(self.today.year, self.today.month)[1]):
-            day = date.today().replace(day=1) + timedelta(days=i)
+        #for i in range(monthrange(self.today.year, self.today.month)[1]):
+        for i in range(31):
+            day = self.today.replace(day=1) + timedelta(days=i)
+
+            if i >= monthrange(self.today.year, self.today.month)[1]:
+                b = SelectDayLayout()
+                self.ids[i + 1] = b
+                #b.size_hint = (1, 0.25)
+                b.size_hint = (0, 0)
+                b.ids.mood.color = (1, 1, 1, 0)
+                b.canvas_opacity_line = 0
+                self.add_widget(b)
+                continue
+            #day = self.today.replace(day=1) + timedelta(days=i)
             b = SelectDayLayout()
-            self.ids[day] = b
+            #self.ids[day] = b
+            self.ids[day.day] = b
             self.add_widget(b)
 
             b.ids.date.text = day.strftime('%m/%d')
@@ -181,24 +272,33 @@ class CalendarBox(GridLayout):
             else:
                 b.ids.mood.source = 'images/moods/' + mood + '.png'
 
-            if day != date.today() and (question == '' or (answer == '' and mood == '')):
+            if day != self.today and (question == '' or (answer == '' and mood == '')):
                 b.ids.select_btn.disabled = True
             # Move to QnA Screen if select date is today
-            if day == date.today():
+            if day == self.today:
+                b.canvas_opacity_border = 1
                 b.ids.select_btn.bind(on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
             else:
                 b.ids.select_btn.bind(
                     on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
 
     def update_data(self, today_ques, today_mood):
-        self.ids[date.today()].ids.select_btn.disabled = False
-        self.ids[date.today()].ids.question.text = today_ques
+        '''self.ids[self.today].ids.select_btn.disabled = False
+        self.ids[self.today].ids.question.text = today_ques
         if today_mood == '':
-            self.ids[date.today()].ids.mood.source = 'images/moods/normal.png'
-            self.ids[date.today()].ids.mood.color = (1, 1, 1, 0)
+            self.ids[self.today].ids.mood.source = 'images/moods/normal.png'
+            self.ids[self.today].ids.mood.color = (1, 1, 1, 0)
         else:
-            self.ids[date.today()].ids.mood.source = 'images/moods/' + today_mood + '.png'
-            self.ids[date.today()].ids.mood.color = (1, 1, 1, 1)
+            self.ids[self.today].ids.mood.source = 'images/moods/' + today_mood + '.png'
+            self.ids[self.today].ids.mood.color = (1, 1, 1, 1)'''
+        self.ids[self.today.day].ids.select_btn.disabled = False
+        self.ids[self.today.day].ids.question.text = today_ques
+        if today_mood == '':
+            self.ids[self.today.day].ids.mood.source = 'images/moods/normal.png'
+            self.ids[self.today.day].ids.mood.color = (1, 1, 1, 0)
+        else:
+            self.ids[self.today.day].ids.mood.source = 'images/moods/' + today_mood + '.png'
+            self.ids[self.today.day].ids.mood.color = (1, 1, 1, 1)
 
 
 class QnAWindow(Screen):
@@ -206,6 +306,7 @@ class QnAWindow(Screen):
     mood = StringProperty(mood)
     if mood_value == '':
         mood_value = 100
+    today = date.today()
 
     def on_slider_value(self, widget):
         self.mood_value = widget.value
@@ -234,8 +335,8 @@ class QnAWindow(Screen):
         is_answered = False
 
         for i in range(len(answers)):  # backward search
-            if answers[len(answers) - i - 1][1] == str(date.today()):
-                answers[len(answers) - i - 1] = [self.ques_id, str(date.today()), self.question, self.answer, self.mood,
+            if answers[len(answers) - i - 1][1] == str(self.today):
+                answers[len(answers) - i - 1] = [self.ques_id, str(self.today), self.question, self.answer, self.mood,
                                                  int(self.mood_value)]
                 is_answered = True
 
@@ -247,7 +348,7 @@ class QnAWindow(Screen):
             with open('user/answers_list.csv', 'a', newline='') as file:
                 answers_list = csv.writer(file)
                 answers_list.writerow(
-                    [self.ques_id, str(date.today()), self.question, self.answer, self.mood, int(self.mood_value)])
+                    [self.ques_id, str(self.today), self.question, self.answer, self.mood, int(self.mood_value)])
 
     def save_answer(self, touch, widget):
         if touch.grab_current == widget:
@@ -260,8 +361,8 @@ class QnAWindow(Screen):
             is_answered = False
 
             for i in range(len(answers)):
-                if answers[len(answers) - i - 1][1] == str(date.today()):
-                    answers[len(answers) - i - 1] = [self.ques_id, str(date.today()), self.question, self.answer,
+                if answers[len(answers) - i - 1][1] == str(self.today):
+                    answers[len(answers) - i - 1] = [self.ques_id, str(self.today), self.question, self.answer,
                                                      self.mood, int(self.mood_value)]
                     is_answered = True
 
@@ -273,7 +374,7 @@ class QnAWindow(Screen):
                 with open('user/answers_list.csv', 'a', newline='') as file:
                     answers_list = csv.writer(file)
                     answers_list.writerow(
-                        [self.ques_id, str(date.today()), self.question, self.answer, self.mood, int(self.mood_value)])
+                        [self.ques_id, str(self.today), self.question, self.answer, self.mood, int(self.mood_value)])
 
 
 class QnAHistoryWindow(Screen):
@@ -316,188 +417,6 @@ class QnAHistoryWindow(Screen):
 
 class SettingWindow(Screen):
     pass
-
-
-'''
-def today_question():
-    questions = pd.read_csv('data/questions_list.csv')
-    ques_id = random.randint(0, len(questions) - 1) + 1
-    today_ques = questions.loc[ques_id - 1, 'english']
-    return today_ques, ques_id
-
-
-# answers_list = pd.DataFrame(columns=['id', 'date', 'question', 'answer', 'mood'])
-# answers_list.to_csv('user/answers_list.csv', sep=',', na_rep='NaN', index=False)
-answers_list = pd.read_csv('user/answers_list.csv')
-
-
-class QnAWindow(Screen):
-    mood = StringProperty('')
-
-    def on_slider_value(self, widget):
-
-        if widget.value < 20:
-            self.mood = 'sad'
-        elif widget.value < 40:
-            self.mood = 'negative'
-        elif widget.value < 60:
-            self.mood = 'normal'
-        elif widget.value < 80:
-            self.mood = 'positive'
-        else:
-            self.mood = 'happy'
-
-    question, ques_id = today_question()
-    answer = ''
-
-    def set_answer(self, ans):
-        self.answer = ans
-        self.ids.answer.text = self.answer
-        self.ids.answer.size_hint = (0.75, 0.05) if self.width < self.height else (0.3, 0.05)
-
-        global answers_list
-        # datetime.today().strftime('%Y-%m-%d')
-
-        if len(answers_list[answers_list.date == str(date.today())]) == 0:
-            answers_list = answers_list.append(
-                {'id': self.ques_id, 'date': str(date.today()), 'question': self.question,
-                 'answer': self.answer, 'mood': self.mood},
-                ignore_index=True)
-        else:
-            answers_list.loc[
-                answers_list.date == str(date.today()), ['id', 'question', 'answer', 'mood']] \
-                = [self.ques_id, self.question, self.answer, self.mood]
-        print(answers_list)
-        answers_list.to_csv('user/answers_list.csv', sep=',', na_rep='NaN', index=False)
-
-    def save_answer(self):
-        global answers_list
-
-        if len(answers_list[answers_list.date == str(date.today())]) == 0:
-            answers_list = answers_list.append(
-                {'id': self.ques_id, 'date': str(date.today()), 'question': self.question,
-                 'answer': self.answer, 'mood': self.mood},
-                ignore_index=True)
-        else:
-            answers_list.loc[
-                answers_list.date == str(date.today()), ['id', 'question', 'answer', 'mood']] \
-                = [self.ques_id, self.question, self.answer, self.mood]
-        print(answers_list)
-        answers_list.to_csv('user/answers_list.csv', sep=',', na_rep='NaN', index=False)
-
-
-class HistoryWindow(Screen):
-    today = date.today()
-    year = today.year
-    month = today.month
-    day = today.day
-
-    if month == 1:
-        month_name = 'January'
-    elif month == 2:
-        month_name = 'February'
-    elif month == 3:
-        month_name = 'March'
-    elif month == 4:
-        month_name = 'April'
-    elif month == 5:
-        month_name = 'May'
-    elif month == 6:
-        month_name = 'June'
-    elif month == 7:
-        month_name = 'July'
-    elif month == 8:
-        month_name = 'August'
-    elif month == 9:
-        month_name = 'September'
-    elif month == 10:
-        month_name = 'October'
-    elif month == 11:
-
-        month_name = 'November'
-    else:
-        month_name = 'December'
-
-    today_text = month_name + ' ' + str(year)
-
-
-class SelectDayHistory(Screen):
-    mood = 'normal'
-    question = 'question'
-    answer = 'answer'
-
-    def access_history(self, select_date):
-        day = "2023-{month}-{day}".format(month=select_date[0:2], day=select_date[3:5])
-
-        if len(answers_list[answers_list['date'] == day]) != 0:
-            self.question = answers_list[answers_list['date'] == day].question.iloc[0]
-        else:
-            self.question = ''
-
-        if len(answers_list[answers_list['date'] == day]) != 0 and \
-                answers_list[answers_list['date'] == day].answer.iloc[0] is not np.NaN:
-            self.answer = answers_list[answers_list['date'] == day].answer.iloc[0]
-        else:
-            self.answer = ''
-
-        if len(answers_list[answers_list['date'] == day]) != 0 and \
-                answers_list[answers_list['date'] == day].mood.iloc[0] is not np.NaN:
-            self.mood = answers_list[answers_list['date'] == day].mood.iloc[0]
-        else:
-            self.mood = ''
-
-        self.ids.last_question.text = self.question
-        self.ids.last_answer.text = self.answer
-        if self.mood == '':
-            self.ids.last_mood.color = (1, 1, 1, 0)
-        else:
-            self.ids.last_mood.source = 'images/moods/' + self.mood + '.png'
-
-
-# class SelectDayButton(Button):
-#    pass
-class SelectDayLayout(RelativeLayout):
-    pass
-
-
-class CalendarBox(GridLayout):
-    cols = 1
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        for i in range(monthrange(date.today().year, date.today().month)[1]):
-            b = SelectDayLayout()
-            self.add_widget(b)
-
-            day = date.today().replace(day=1) + timedelta(days=i)
-
-            b.ids.date.text = day.strftime('%m/%d')
-
-            if len(answers_list[answers_list['date'] == str(day)]) != 0:
-                question = answers_list[answers_list['date'] == str(day)].question.iloc[0]
-            else:
-                question = ''
-            b.ids.question.text = question
-
-            if len(answers_list[answers_list['date'] == str(day)]) != 0 and \
-                    answers_list[answers_list['date'] == str(day)].mood.iloc[0] is not np.NaN:
-                mood = answers_list[answers_list['date'] == str(day)].mood.iloc[0]
-            else:
-                mood = ''
-            if mood == '':
-
-                # b.ids.mood.source = 'images/moods/normal.png'
-                b.ids.mood.color = (1, 1, 1, 0)
-            else:
-                b.ids.mood.source = 'images/moods/' + mood + '.png'
-
-            if question == '':
-                b.ids.select_btn.disabled = True
-
-
-class SettingWindow(Screen):
-    pass
-'''
 
 
 class RunApp(App):

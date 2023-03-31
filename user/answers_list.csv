@@ -2,8 +2,8 @@ id,date,question,answer,mood,mood_value
 123,2023-02-18,Are you messy or neat?,ans2,sad,2
 124,2023-02-19,"If you could have superpower just for today, what would it be?",ans2 sdks sdfdsf,sad,3
 125,2023-02-20,When was the last time you went swimming?,ansasd2,happy,190
-9,2023-03-10,Was today typical? Why or why not?,ans1,sad,10
-10,2023-02-24,Who gave you life-changing advice?,ans2,sad,10
+9,2023-02-21,Was today typical? Why or why not?,ans1,sad,10
+10,2023-02-24,Who gave you life-changing advice?,,,100
 11,2023-02-26,Today you lost ……… .,ans3,negative,50
 12,2023-02-27,What's your favorite accessory?,ans3,sad,10
 13,2023-02-28,Where do you want to travel next?,fed ans4,happy,180
