@@ -7,12 +7,13 @@ from datetime import date, datetime, timedelta
 import random
 import csv
 from kivy import Config
+from kivy.animation import Animation
 from kivy.app import App
-from kivy.factory import Factory
+from kivy.clock import Clock
+from kivy.core.audio import SoundLoader
 # from kivy.core.window import Window
 from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.popup import Popup
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 
@@ -90,37 +91,51 @@ class WindowManager(ScreenManager):
                     'qna').previous_screen == 'main':
                 self.current = "main"
                 self.transition.direction = 'right'
+                App.get_running_app().wave_sound.stop()
+                App.get_running_app().switch_screen2.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "qna" and App.get_running_app().root.get_screen(
                     'qna').previous_screen == 'history':
                 self.current = "history"
                 self.transition.direction = 'right'
+                App.get_running_app().wave_sound.stop()
+                App.get_running_app().switch_screen2.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "history":
                 self.current = "main"
                 self.transition.direction = 'right'
+                App.get_running_app().switch_screen2.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "ques_history" and App.get_running_app().root.get_screen(
                     'ques_history').previous_screen == 'qna':
                 self.current = "qna"
                 self.transition.direction = 'right'
+                App.get_running_app().switch_screen2.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "ques_history" and App.get_running_app().root.get_screen(
                     'ques_history').previous_screen == 'qna_history':
                 self.current = "qna_history"
                 self.transition.direction = 'right'
+                App.get_running_app().switch_screen2.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "qna_history":
                 self.current = "history"
                 self.transition.direction = 'right'
+                App.get_running_app().switch_screen2.play()
                 return True  # do not exit the app
             elif self.current_screen.name == "setting":
                 self.current = "main"
                 self.transition.direction = 'right'
+                App.get_running_app().switch_screen2.play()
                 return True  # do not exit the app
 
 
 class MainWindow(Screen):
+    '''def update(dt):
+        print(datetime.now().second / 100)
+        return datetime.now().second / 100
+
+    Clock.schedule_interval(update, 1.0 / 60.0)'''
     pass
 
 
@@ -175,15 +190,19 @@ class SelectDayLayout(RelativeLayout):
 class CalendarBox(GridLayout):
     cols = 1
     today = date.today()
+    weekdays = {0: 'MON', 1: 'TUE', 2: 'WED', 3: 'THU',
+                4: 'FRI', 5: 'SAT', 6: 'SUN'}
 
     def change_calendar(self, new_month, new_year):
         for i in range(31):
             # for i in range(monthrange(new_year, new_month)[1]):
             day = self.today.replace(year=new_year, month=new_month, day=1) + timedelta(days=i)
+            weekday_idx = (monthrange(new_year, new_month)[0] + i) % 6
 
             if i >= monthrange(new_year, new_month)[1]:
                 self.ids[i + 1].size_hint = (0, 0)
                 self.ids[i + 1].ids.date.text = ''
+                self.ids[i + 1].ids.weekday.text = ''
                 self.ids[i + 1].ids.question.text = ''
                 self.ids[i + 1].ids.year_saver.text = ''
                 self.ids[i + 1].ids.select_btn.disabled = True
@@ -195,6 +214,7 @@ class CalendarBox(GridLayout):
 
             self.ids[day.day].size_hint = (1, 0.25)
             self.ids[day.day].ids.date.text = day.strftime('%m/%d')
+            self.ids[day.day].ids.weekday.text = self.weekdays[weekday_idx]
             self.ids[day.day].ids.year_saver.text = day.strftime('%Y')
             answers = []
 
@@ -231,6 +251,7 @@ class CalendarBox(GridLayout):
                 self.ids[day.day].canvas_opacity_border = 1
                 self.ids[day.day].ids.select_btn.bind(
                     on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
+                self.ids[day.day].ids.select_btn.bind(on_release=lambda *args: App.get_running_app().wave_sound.play())
             else:
                 self.ids[day.day].canvas_opacity_border = 0
                 self.ids[day.day].ids.select_btn.bind(
@@ -244,6 +265,7 @@ class CalendarBox(GridLayout):
         # for i in range(monthrange(self.today.year, self.today.month)[1]):
         for i in range(31):
             day = self.today.replace(day=1) + timedelta(days=i)
+            weekday_idx = (monthrange(self.today.year, self.today.month)[0] + i) % 6
 
             if i >= monthrange(self.today.year, self.today.month)[1]:
                 b = SelectDayLayout()
@@ -261,6 +283,7 @@ class CalendarBox(GridLayout):
             self.add_widget(b)
             b.size_hint = (1, 0.25)
             b.ids.date.text = day.strftime('%m/%d')
+            b.ids.weekday.text = self.weekdays[weekday_idx]
             b.ids.year_saver.text = day.strftime('%Y')
 
             answers = []
@@ -293,6 +316,7 @@ class CalendarBox(GridLayout):
             if day == self.today:
                 b.canvas_opacity_border = 1
                 b.ids.select_btn.bind(on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
+                b.ids.select_btn.bind(on_release=lambda *args: App.get_running_app().wave_sound.play())
             else:
                 b.ids.select_btn.bind(
                     on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
@@ -424,10 +448,12 @@ class QuestionHistory(Screen):
             if last_dates[j] != '':
                 self.ids[str(j)].ids.date.text = '{month}-{day}'.format(month=last_dates[j][5:7],
                                                                         day=last_dates[j][8:10])
+                self.ids[str(j)].ids.year.text = '{year}'.format(year=last_dates[j][0:4])
                 self.ids[str(j)].canvas_background_color = 200 / 255
                 self.ids[str(j)].canvas_background_alpha = 0.4
             else:
                 self.ids[str(j)].ids.date.text = ''
+                self.ids[str(j)].ids.year.text = ''
                 self.ids[str(j)].canvas_background_color = 100 / 255
                 self.ids[str(j)].canvas_background_alpha = 0.8
             self.ids[str(j)].ids.answer.text = last_answers[j]
@@ -479,13 +505,91 @@ class QnAHistoryWindow(Screen):
 
 
 class SettingWindow(Screen):
-    pass
+    def music_setting(self, widget):
+        if widget.active:
+            # turn on/off music by switch value
+            App.get_running_app().background_music.volume = 1
+            App.get_running_app().wave_sound.volume = 0.25
+            # save into setting file
+            settings = None
+            with open('setting.csv', 'r', newline='') as file:
+                setting = csv.reader(file)
+                settings = next(setting)
+
+            with open('setting.csv', 'w', newline='') as file:
+                setting = csv.writer(file)
+                setting.writerow([settings[0], 'on', settings[2]])
+        else:
+            App.get_running_app().background_music.volume = 0
+            App.get_running_app().wave_sound.volume = 0
+            settings = None
+            with open('setting.csv', 'r', newline='') as file:
+                setting = csv.reader(file)
+                settings = next(setting)
+
+            with open('setting.csv', 'w', newline='') as file:
+                setting = csv.writer(file)
+                setting.writerow([settings[0], 'off', settings[2]])
+
+    def sound_setting(self, widget):
+        if widget.active:
+            # turn on/off effect sound by switch value
+            App.get_running_app().switch_screen1.volume = 1
+            App.get_running_app().switch_screen2.volume = 1
+            App.get_running_app().click.volume = 0.5
+            # save into setting file
+            settings = None
+            with open('setting.csv', 'r', newline='') as file:
+                setting = csv.reader(file)
+                settings = next(setting)
+
+            with open('setting.csv', 'w', newline='') as file:
+                setting = csv.writer(file)
+                setting.writerow([settings[0], settings[1], 'on'])
+        else:
+            App.get_running_app().switch_screen1.volume = 0
+            App.get_running_app().switch_screen2.volume = 0
+            App.get_running_app().click.volume = 0
+            settings = None
+            with open('setting.csv', 'r', newline='') as file:
+                setting = csv.reader(file)
+                settings = next(setting)
+
+            with open('setting.csv', 'w', newline='') as file:
+                setting = csv.writer(file)
+                setting.writerow([settings[0], settings[1], 'off'])
 
 
 class RunApp(App):
-    # def build(self):
-    #    return kv
-    pass
+    settings = None
+    with open('setting.csv', 'r', newline='') as file:
+        setting = csv.reader(file)
+        settings = next(setting)
+
+    language = settings[0]
+    music = 1 if settings[1] == 'on' else 0
+    sound = 1 if settings[2] == 'on' else 0
+
+    # init_audio
+    # Background music:
+    background_music = SoundLoader.load('audio/background(Lesfm).mp3')
+    background_music.volume = 1 * music
+    background_music.loop = True
+    # Affect sound:
+    # only play in QnA Screen
+    wave_sound = SoundLoader.load('audio/wave_sound(DennisH18).mp3')
+    wave_sound.volume = 0.25 * music
+    wave_sound.loop = True
+    # play when switching screens
+    switch_screen1 = SoundLoader.load('audio/switch_sound1.mp3')
+    switch_screen2 = SoundLoader.load('audio/switch_sound2.mp3')
+    switch_screen1.volume = 1 * sound
+    switch_screen2.volume = 1 * sound
+    # play when click button
+    click = SoundLoader.load('audio/click(UNIVERSFIELD).mp3')
+    click.volume = 0.5 * sound
+
+    background_music.play()
 
 
 runApp = RunApp()
