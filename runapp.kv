@@ -434,13 +434,18 @@ WindowManager:
                         id: eng_btn
                         #group: 'lang_btn'
                         text: 'English' if app.language == 'english' else '영어'
-                        state: 'down' if root.ids.kor_btn.state == 'normal' else 'normal'
-                        on_state: root.lang_setting(self)
+                        state:'down' if root.language == 'english' else 'normal'
+                            #'down' if app.language == 'english' else 'normal'
+                            #'normal' if root.ids.kor_btn.state == 'down' else 'down'
+                        on_state: root.eng_setting(self)
                     LanguageButton:
                         id: kor_btn
                         #group: 'lang_btn'
                         text: 'Korean' if app.language == 'english' else '한국어'
-                        state: 'normal' if root.ids.eng_btn.state == 'down' else 'down'
+                        state: 'down' if root.language == 'korean' else 'normal'
+                            #'normal' if root.ids.eng_btn.state == 'down' else 'down'
+                            #'down' if app.language == 'korean' else 'normal'
+                        on_state: root.kor_setting(self)
                 Label:
                     text: 'Background Music:' if app.language == 'english' else '배경 음악:'
                     font_name: 'fonts/korean2'

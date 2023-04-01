@@ -185,8 +185,11 @@ class HistoryWindow(Screen):
         else:
             self.month = self.today.month
             self.year = self.today.year
+        if self.settings[0] == 'english':
+            self.today_text = self.months[self.month] + ' ' + str(self.year)
+        else:
+            self.today_text = str(self.year) + '년' + ' ' + str(self.month) + '월'
 
-        self.today_text = self.months[self.month] + ' ' + str(self.year)
         self.ids.select_month.text = self.today_text
         self.days_in_month = monthrange(self.year, self.month)[1]
         # resize scroll screen
@@ -207,12 +210,14 @@ class CalendarBox(GridLayout):
     today = date.today()
     weekdays = {0: 'MON', 1: 'TUE', 2: 'WED', 3: 'THU',
                 4: 'FRI', 5: 'SAT', 6: 'SUN'}
+    weekdays_kor = {0: '월', 1: '화', 2: '수', 3: '목',
+                    4: '금', 5: '토', 6: '일'}
 
     def change_calendar(self, new_month, new_year):
         for i in range(31):
             # for i in range(monthrange(new_year, new_month)[1]):
             day = self.today.replace(year=new_year, month=new_month, day=1) + timedelta(days=i)
-            weekday_idx = (monthrange(new_year, new_month)[0] + i) % 6
+            weekday_idx = (monthrange(new_year, new_month)[0] + i) % 7
 
             if i >= monthrange(new_year, new_month)[1]:
                 self.ids[i + 1].size_hint = (0, 0)
@@ -229,7 +234,10 @@ class CalendarBox(GridLayout):
 
             self.ids[day.day].size_hint = (1, 0.25)
             self.ids[day.day].ids.date.text = day.strftime('%m/%d')
-            self.ids[day.day].ids.weekday.text = self.weekdays[weekday_idx]
+            if App.get_running_app().language == 'english':
+                self.ids[day.day].ids.weekday.text = self.weekdays[weekday_idx]
+            else:
+                self.ids[day.day].ids.weekday.text = self.weekdays_kor[weekday_idx]
             self.ids[day.day].ids.year_saver.text = day.strftime('%Y')
             answers = []
 
@@ -262,6 +270,7 @@ class CalendarBox(GridLayout):
             else:
                 self.ids[day.day].ids.select_btn.disabled = False
             # Move to QnA Screen if select date is today
+            print(day, self.today, day == self.today)
             if day == self.today:
                 self.ids[day.day].canvas_opacity_border = 1
                 self.ids[day.day].ids.select_btn.bind(
@@ -279,7 +288,7 @@ class CalendarBox(GridLayout):
         # for i in range(monthrange(self.today.year, self.today.month)[1]):
         for i in range(31):
             day = self.today.replace(day=1) + timedelta(days=i)
-            weekday_idx = (monthrange(self.today.year, self.today.month)[0] + i) % 6
+            weekday_idx = (monthrange(self.today.year, self.today.month)[0] + i) % 7
 
             if i >= monthrange(self.today.year, self.today.month)[1]:
                 b = SelectDayLayout()
@@ -297,7 +306,10 @@ class CalendarBox(GridLayout):
             self.add_widget(b)
             b.size_hint = (1, 0.25)
             b.ids.date.text = day.strftime('%m/%d')
-            b.ids.weekday.text = self.weekdays[weekday_idx]
+            if App.get_running_app().language == 'english':
+                b.ids.weekday.text = self.weekdays[weekday_idx]
+            else:
+                b.ids.weekday.text = self.weekdays_kor[weekday_idx]
             b.ids.year_saver.text = day.strftime('%Y')
 
             answers = []
@@ -518,6 +530,13 @@ class QnAHistoryWindow(Screen):
 
 
 class SettingWindow(Screen):
+    settings = None
+    with open('setting.csv', 'r', newline='') as file:
+        setting = csv.reader(file)
+        settings = next(setting)
+
+    language = settings[0]
+
     def music_setting(self, widget):
         if widget.active:
             # turn on/off music by switch value
@@ -568,8 +587,9 @@ class SettingWindow(Screen):
                 setting = csv.writer(file)
                 setting.writerow([settings[0], settings[1], 'off'])
 
-    def lang_setting(self, widget):
+    def eng_setting(self, widget):
         if widget.state == 'down':
+            self.ids.kor_btn.state = 'normal'
             settings = None
             with open('setting.csv', 'r', newline='') as file:
                 setting = csv.reader(file)
@@ -579,6 +599,7 @@ class SettingWindow(Screen):
                 setting = csv.writer(file)
                 setting.writerow(['english', settings[1], settings[2]])
         else:
+            self.ids.kor_btn.state = 'down'
             settings = None
             with open('setting.csv', 'r', newline='') as file:
                 setting = csv.reader(file)
@@ -588,6 +609,27 @@ class SettingWindow(Screen):
                 setting = csv.writer(file)
                 setting.writerow(['korean', settings[1], settings[2]])
 
+    def kor_setting(self, widget):
+        if widget.state == 'down':
+            self.ids.eng_btn.state = 'normal'
+            settings = None
+            with open('setting.csv', 'r', newline='') as file:
+                setting = csv.reader(file)
+                settings = next(setting)
+
+            with open('setting.csv', 'w', newline='') as file:
+                setting = csv.writer(file)
+                setting.writerow(['korean', settings[1], settings[2]])
+        else:
+            self.ids.eng_btn.state = 'down'
+            settings = None
+            with open('setting.csv', 'r', newline='') as file:
+                setting = csv.reader(file)
+                settings = next(setting)
+
+            with open('setting.csv', 'w', newline='') as file:
+                setting = csv.writer(file)
+                setting.writerow(['english', settings[1], settings[2]])
 
 
 class RunApp(App):
