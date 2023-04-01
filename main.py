@@ -568,6 +568,27 @@ class SettingWindow(Screen):
                 setting = csv.writer(file)
                 setting.writerow([settings[0], settings[1], 'off'])
 
+    def lang_setting(self, widget):
+        if widget.state == 'down':
+            settings = None
+            with open('setting.csv', 'r', newline='') as file:
+                setting = csv.reader(file)
+                settings = next(setting)
+
+            with open('setting.csv', 'w', newline='') as file:
+                setting = csv.writer(file)
+                setting.writerow(['english', settings[1], settings[2]])
+        else:
+            settings = None
+            with open('setting.csv', 'r', newline='') as file:
+                setting = csv.reader(file)
+                settings = next(setting)
+
+            with open('setting.csv', 'w', newline='') as file:
+                setting = csv.writer(file)
+                setting.writerow(['korean', settings[1], settings[2]])
+
+
 
 class RunApp(App):
     settings = None

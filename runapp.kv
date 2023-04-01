@@ -92,7 +92,7 @@ WindowManager:
 
         Label:
             text: 'Your mood today:' if app.language == 'english' else '오늘 기분:'
-            font_name: 'fonts/vintage1'
+            font_name: 'fonts/vintage1' if app.language == 'english' else 'fonts/korean4'
             font_size: dp(30)
             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
         Slider:
@@ -189,7 +189,7 @@ WindowManager:
 
         Label:
             text: "Your mood:" if app.language == 'english' else '기분:'
-            font_name: 'fonts/vintage1'
+            font_name: 'fonts/vintage1' if app.language == 'english' else 'fonts/korean4'
             font_size: dp(30)
             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
         Slider:
@@ -432,13 +432,15 @@ WindowManager:
                     padding: (20,0,20,0)
                     LanguageButton:
                         id: eng_btn
-                        group: 'lang_btn'
+                        #group: 'lang_btn'
                         text: 'English' if app.language == 'english' else '영어'
-                        state: 'down'
+                        state: 'down' if root.ids.kor_btn.state == 'normal' else 'normal'
+                        on_state: root.lang_setting(self)
                     LanguageButton:
                         id: kor_btn
-                        group: 'lang_btn'
+                        #group: 'lang_btn'
                         text: 'Korean' if app.language == 'english' else '한국어'
+                        state: 'normal' if root.ids.eng_btn.state == 'down' else 'down'
                 Label:
                     text: 'Background Music:' if app.language == 'english' else '배경 음악:'
                     font_name: 'fonts/korean2'
