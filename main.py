@@ -23,6 +23,14 @@ from kivy.core.window import Window
 
 
 def today_question():
+    # load language
+    settings = None
+    with open('setting.csv', 'r', newline='') as file:
+        setting = csv.reader(file)
+        settings = next(setting)
+    # language mode: 2 for english, 1 for korean
+    lang_mode = 2 if settings[0] == 'english' else 1
+
     questions = []
     # load questions list
     with open('data/questions_list.csv', 'r') as file:
@@ -41,7 +49,7 @@ def today_question():
     for i in range(len(answers)):
         if answers[i][1] == str(today):
             ques_id = answers[i][0]
-            today_ques = answers[i][2]
+            today_ques = questions[int(ques_id)][lang_mode]
             today_ans = answers[i][3]
             today_mood = answers[i][4]
             mood_value = answers[i][5]
@@ -65,7 +73,7 @@ def today_question():
         # try to random another question
         ques_id = str(random.randint(1, len(questions) - 1))
 
-    today_ques = questions[int(ques_id)][2]
+    today_ques = questions[int(ques_id)][lang_mode]
     today_ans = ''
     today_mood = ''
     mood_value = ''
@@ -150,7 +158,16 @@ class HistoryWindow(Screen):
     months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
               7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
 
-    today_text = months[month] + ' ' + str(year)
+    # load language
+    settings = None
+    with open('setting.csv', 'r', newline='') as file:
+        setting = csv.reader(file)
+        settings = next(setting)
+
+    if settings[0] == 'english':
+        today_text = months[month] + ' ' + str(year)
+    else:
+        today_text = str(year) + '년' + ' ' + str(month) + '월'
 
     def change_month(self, action):
         if action == 'previous':

@@ -63,8 +63,8 @@ WindowManager:
             spacing: '10dp'
 
             OptionButton:
-                text: 'History'
-                font_name: 'fonts/vintage2.otf'
+                text: 'History' if app.language == 'english' else '내역'
+                font_name: 'fonts/vintage2.otf' if app.language == 'english' else 'fonts/korean4'
                 font_size: '40dp'
                 on_release:
                     app.root.current = 'history'
@@ -72,8 +72,8 @@ WindowManager:
                     app.switch_screen.play()
 
             OptionButton:
-                text: 'Setting'
-                font_name: 'fonts/vintage2.otf'
+                text: 'Setting' if app.language == 'english' else '설정'
+                font_name: 'fonts/vintage2.otf' if app.language == 'english' else 'fonts/korean4'
                 font_size: '40dp'
                 on_release:
                     app.root.current = 'setting'
@@ -91,7 +91,7 @@ WindowManager:
             color: (1,1,1,0.5)
 
         Label:
-            text: "Your mood today:"
+            text: 'Your mood today:' if app.language == 'english' else '오늘 기분:'
             font_name: 'fonts/vintage1'
             font_size: dp(30)
             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
@@ -143,7 +143,7 @@ WindowManager:
             color: (0, 0, 0)
         TypeBox:
             id: typebox
-            text: 'Type your answer...'
+            text: 'Type your answer...' if app.language == 'english' else '답 입력...'
             font_name: 'fonts/korean1.ttf'
             size_hint: (0.8, 0.05)
             pos_hint: {'center_x': 0.5, 'center_y': 0.4}
@@ -152,7 +152,7 @@ WindowManager:
                 Factory.AnswerWriteBox().open()
                 root.is_popup_open = True
         Button:
-            text: '>> This question history <<'
+            text: '>> This question history <<' if app.language == 'english' else '>> 이 질문 내역 <<'
             font_name: 'fonts/korean2'
             font_size: dp(20) if self.state == 'normal' else dp(23)
             color: (1,1,1,1) if self.state == 'normal' else (215/255, 160/255, 220/255, 1)
@@ -188,7 +188,7 @@ WindowManager:
             color: (1, 1, 1, 0)
 
         Label:
-            text: "Your mood:"
+            text: "Your mood:" if app.language == 'english' else '기분:'
             font_name: 'fonts/vintage1'
             font_size: dp(30)
             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
@@ -232,7 +232,7 @@ WindowManager:
             size_hint: (0.75, 0.05)
             color: (0, 0, 0)
         Button:
-            text: '>> This question history <<'
+            text: '>> This question history <<' if app.language == 'english' else '>> 이 질문 내역 <<'
             font_name: 'fonts/korean2'
             font_size: dp(20) if self.state == 'normal' else dp(23)
             color: (1,1,1,1) if self.state == 'normal' else (215/255, 140/255, 220/255, 1)
@@ -330,7 +330,7 @@ WindowManager:
             orientation: 'vertical'
             TopBar:
                 Label:
-                    text: 'This Question Last 5 Times'
+                    text: 'This Question Last 5 Times' if app.language == 'english' else '이 질문의 최근 다섯 번'
                     font_name: 'fonts/korean2'
                     bold: True
                     color: (0,0,0)
@@ -360,7 +360,7 @@ WindowManager:
                             pos: self.pos
                             radius: [20]
                 Label:
-                    text: 'Your answer:'
+                    text: 'Your answer:' if app.language == 'english' else '대답 내역:'
                     font_name: 'fonts/korean1'
                     font_size: dp(20)
                     size_hint: (1,0.4)
@@ -417,7 +417,7 @@ WindowManager:
                         pos: self.pos
                         radius: [40]
                 Label:
-                    text: 'Language:'
+                    text: 'Language:' if app.language == 'english' else '언어:'
                     font_name: 'fonts/korean2'
                     font_size: dp(25)
                     color: (0,0,0,1)
@@ -433,14 +433,14 @@ WindowManager:
                     LanguageButton:
                         id: eng_btn
                         group: 'lang_btn'
-                        text: 'English'
+                        text: 'English' if app.language == 'english' else '영어'
                         state: 'down'
                     LanguageButton:
                         id: kor_btn
                         group: 'lang_btn'
-                        text: 'Korean'
+                        text: 'Korean' if app.language == 'english' else '한국어'
                 Label:
-                    text: 'Background music:'
+                    text: 'Background Music:' if app.language == 'english' else '배경 음악:'
                     font_name: 'fonts/korean2'
                     font_size: dp(25)
                     color: (0,0,0,1)
@@ -457,7 +457,7 @@ WindowManager:
                         app.click.play()
                         root.music_setting(self)
                 Label:
-                    text: 'Effect Sound:'
+                    text: 'Effect Sound:' if app.language == 'english' else '효과음'
                     font_name: 'fonts/korean2'
                     font_size: dp(25)
                     color: (0,0,0,1)
@@ -476,7 +476,7 @@ WindowManager:
             Button:
                 size_hint: (0.3, 0.075)
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                text: 'Save'
+                text: 'Save' if app.language == 'english' else '저장'
                 font_name: 'fonts/korean2'
                 font_size: dp(20)
                 background_color: (0,0,0,0)
@@ -655,7 +655,10 @@ WindowManager:
 
 <AnswerWriteBox@Popup>:
     background_color: (0,0,0,0)
-    title: 'Your answer:'
+    title: 'Your answer:' if app.language == 'english' else '대답:'
+    title_align: 'center'
+    title_font: 'fonts/korean2'
+    title_size: dp(18)
     auto_dismiss: False
     size_hint: (0.9, 0.65)
     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
@@ -683,14 +686,14 @@ WindowManager:
             spacing: dp(200)
             PopupButton:
                 pos_hint: {'x': 0, 'bottom': 0}
-                text: 'Close'
+                text: 'Close' if app.language == 'english' else '닫기'
                 on_release:
                     root.dismiss()
                     app.click.play()
                     app.root.get_screen('qna').is_popup_open = False
             PopupButton:
                 pos_hint: {'right': 1, 'bottom': 0}
-                text: 'Answer'
+                text: 'Answer' if app.language == 'english' else '대답'
                 on_release:
                     root.dismiss()
                     app.click.play()
@@ -741,7 +744,7 @@ WindowManager:
                 valign: 'bottom'
             Label:
                 id: year
-                text: '2023'
+                #text: '2023'
                 font_name: 'fonts/korean1.ttf'
                 font_size: dp(16)
                 text_size: self.size
