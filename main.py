@@ -652,7 +652,6 @@ class SettingWindow(Screen):
                 setting.writerow(['english', settings[1], settings[2]])
 
 
-
 class RunApp(App):
     settings = None
     with open('setting.csv', 'r', newline='') as file:
@@ -677,6 +676,11 @@ class RunApp(App):
     click.volume = 0.5 * sound
 
     background_music.play()
+
+    def restart(self):
+        #self.root.clear_widgets()
+        self.stop()
+        return RunApp().run()
 
 
 runApp = RunApp()
