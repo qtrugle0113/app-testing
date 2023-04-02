@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 # import kivy
 # import pandas as pd
 # import numpy as np
-import os
+import os, sys
 import random
 import csv
 from kivy import Config
@@ -677,10 +677,11 @@ class RunApp(App):
 
     background_music.play()
 
-    def restart(self):
+    @staticmethod
+    def restart():
+        print(f'exec:{sys.executable} {["python"] + sys.argv}')
+        os.execvp(sys.executable, ['python'] + sys.argv)
         #self.root.clear_widgets()
-        self.stop()
-        return RunApp().run()
 
 
 runApp = RunApp()
