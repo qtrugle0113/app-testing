@@ -4,6 +4,7 @@ from datetime import date, datetime, timedelta
 # import kivy
 # import pandas as pd
 # import numpy as np
+import os
 import random
 import csv
 from kivy import Config
@@ -21,6 +22,13 @@ Config.set('graphics', 'width', '450')
 Config.set('graphics', 'height', '1000')
 from kivy.core.window import Window
 
+questions = []
+# load questions list
+with open('data/questions_list.csv', 'r') as file:
+    questions_list = csv.reader(file)
+    for row in questions_list:
+        questions.append(row)
+
 
 def today_question():
     # load language
@@ -31,12 +39,12 @@ def today_question():
     # language mode: 2 for english, 1 for korean
     lang_mode = 2 if settings[0] == 'english' else 1
 
-    questions = []
+    """questions = []
     # load questions list
     with open('data/questions_list.csv', 'r') as file:
         questions_list = csv.reader(file)
         for row in questions_list:
-            questions.append(row)
+            questions.append(row)"""
 
     # if already created, reload question data
     answers = []
@@ -137,11 +145,6 @@ class WindowManager(ScreenManager):
 
 
 class MainWindow(Screen):
-    '''def update(dt):
-        print(datetime.now().second / 100)
-        return datetime.now().second / 100
-
-    Clock.schedule_interval(update, 1.0 / 60.0)'''
     pass
 
 
@@ -151,6 +154,7 @@ class HistoryWindow(Screen):
     month = today.month
     day = today.day
     days_in_month = monthrange(year, month)[1]
+    today_text = None
     # set position for the scroll calendar box: 1 is top, 0 is bottom
     # scroll_view_pos = 1 - day/days_in_month
     scroll_view_pos = 1
@@ -196,13 +200,19 @@ class HistoryWindow(Screen):
         self.ids.calendar_box.height = 250 * self.days_in_month
         self.ids.calendar_box.change_calendar(self.month, self.year)
         self.ids.scroll_box.scroll_y = 1
-        print(self.month, self.year)
+        # print(self.month, self.year)
 
 
 class SelectDayLayout(RelativeLayout):
     canvas_opacity_line = NumericProperty(1, rebind=True)
     canvas_opacity_button = NumericProperty(0.4, rebind=True)
     canvas_opacity_border = NumericProperty(0, rebind=True)
+
+    def screen_switch_setting(self, border):
+        if border == 1:  # only 'today' row has a border
+            return 'qna'
+        else:
+            return 'qna_history'
 
 
 class CalendarBox(GridLayout):
@@ -212,76 +222,6 @@ class CalendarBox(GridLayout):
                 4: 'FRI', 5: 'SAT', 6: 'SUN'}
     weekdays_kor = {0: '월', 1: '화', 2: '수', 3: '목',
                     4: '금', 5: '토', 6: '일'}
-
-    def change_calendar(self, new_month, new_year):
-        for i in range(31):
-            # for i in range(monthrange(new_year, new_month)[1]):
-            day = self.today.replace(year=new_year, month=new_month, day=1) + timedelta(days=i)
-            weekday_idx = (monthrange(new_year, new_month)[0] + i) % 7
-
-            if i >= monthrange(new_year, new_month)[1]:
-                self.ids[i + 1].size_hint = (0, 0)
-                self.ids[i + 1].ids.date.text = ''
-                self.ids[i + 1].ids.weekday.text = ''
-                self.ids[i + 1].ids.question.text = ''
-                self.ids[i + 1].ids.year_saver.text = ''
-                self.ids[i + 1].ids.select_btn.disabled = True
-                self.ids[i + 1].ids.mood.color = (1, 1, 1, 0)
-                self.ids[i + 1].canvas_opacity_line = 0
-                self.ids[i + 1].canvas_opacity_button = 0
-                self.ids[i + 1].canvas_opacity_border = 0
-                continue
-
-            self.ids[day.day].size_hint = (1, 0.25)
-            self.ids[day.day].ids.date.text = day.strftime('%m/%d')
-            if App.get_running_app().language == 'english':
-                self.ids[day.day].ids.weekday.text = self.weekdays[weekday_idx]
-            else:
-                self.ids[day.day].ids.weekday.text = self.weekdays_kor[weekday_idx]
-            self.ids[day.day].ids.year_saver.text = day.strftime('%Y')
-            answers = []
-
-            with open('user/answers_list.csv', 'r') as file:
-                answers_list = csv.reader(file)
-                for row in answers_list:
-                    answers.append(row)
-
-            question = ''
-            answer = ''
-            mood = ''
-
-            for j in range(len(answers)):
-                if answers[j][1] == str(day):
-                    question = answers[j][2]
-                    answer = answers[j][3]
-                    mood = answers[j][4]
-                    break
-
-            self.ids[day.day].ids.question.text = question
-            if mood == '':
-                self.ids[day.day].ids.mood.source = 'images/moods/normal.png'
-                self.ids[day.day].ids.mood.color = (1, 1, 1, 0)
-            else:
-                self.ids[day.day].ids.mood.source = 'images/moods/' + mood + '.png'
-                self.ids[day.day].ids.mood.color = (1, 1, 1, 1)
-
-            if day != self.today and (question == '' or (answer == '' and mood == '')):
-                self.ids[day.day].ids.select_btn.disabled = True
-            else:
-                self.ids[day.day].ids.select_btn.disabled = False
-            # Move to QnA Screen if select date is today
-            print(day, self.today, day == self.today)
-            if day == self.today:
-                self.ids[day.day].canvas_opacity_border = 1
-                self.ids[day.day].ids.select_btn.bind(
-                    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
-            else:
-                self.ids[day.day].canvas_opacity_border = 0
-                self.ids[day.day].ids.select_btn.bind(
-                    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
-
-            self.ids[day.day].canvas_opacity_line = 1
-            self.ids[day.day].canvas_opacity_button = 0.4
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -324,7 +264,12 @@ class CalendarBox(GridLayout):
             mood = ''
             for j in range(len(answers)):
                 if answers[j][1] == str(day):
-                    question = answers[j][2]
+                    if App.get_running_app().language == 'english' and day == self.today:
+                        question = questions[int(answers[j][0])][2]
+                    elif App.get_running_app().language == 'korean' and day == self.today:
+                        question = questions[int(answers[j][0])][1]
+                    else:
+                        question = answers[j][2]
                     answer = answers[j][3]
                     mood = answers[j][4]
                     break
@@ -341,10 +286,85 @@ class CalendarBox(GridLayout):
             # Move to QnA Screen if select date is today
             if day == self.today:
                 b.canvas_opacity_border = 1
-                b.ids.select_btn.bind(on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
+                # b.ids.select_btn.bind(on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
             else:
-                b.ids.select_btn.bind(
-                    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
+                b.canvas_opacity_border = 0
+                # b.ids.select_btn.bind(
+                #    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
+
+    def change_calendar(self, new_month, new_year):
+        for i in range(31):
+            # for i in range(monthrange(new_year, new_month)[1]):
+            day = self.today.replace(year=new_year, month=new_month, day=1) + timedelta(days=i)
+            weekday_idx = (monthrange(new_year, new_month)[0] + i) % 7
+
+            if i >= monthrange(new_year, new_month)[1]:
+                self.ids[i + 1].size_hint = (0, 0)
+                self.ids[i + 1].ids.date.text = ''
+                self.ids[i + 1].ids.weekday.text = ''
+                self.ids[i + 1].ids.question.text = ''
+                self.ids[i + 1].ids.year_saver.text = ''
+                self.ids[i + 1].ids.select_btn.disabled = True
+                self.ids[i + 1].ids.mood.color = (1, 1, 1, 0)
+                self.ids[i + 1].canvas_opacity_line = 0
+                self.ids[i + 1].canvas_opacity_button = 0
+                self.ids[i + 1].canvas_opacity_border = 0
+                continue
+
+            self.ids[day.day].size_hint = (1, 0.25)
+            self.ids[day.day].ids.date.text = day.strftime('%m/%d')
+            if App.get_running_app().language == 'english':
+                self.ids[day.day].ids.weekday.text = self.weekdays[weekday_idx]
+            else:
+                self.ids[day.day].ids.weekday.text = self.weekdays_kor[weekday_idx]
+            self.ids[day.day].ids.year_saver.text = day.strftime('%Y')
+            answers = []
+
+            with open('user/answers_list.csv', 'r') as file:
+                answers_list = csv.reader(file)
+                for row in answers_list:
+                    answers.append(row)
+
+            question = ''
+            answer = ''
+            mood = ''
+
+            for j in range(len(answers)):
+                if answers[j][1] == str(day):
+                    if App.get_running_app().language == 'english' and day == self.today:
+                        question = questions[int(answers[j][0])][2]
+                    elif App.get_running_app().language == 'korean' and day == self.today:
+                        question = questions[int(answers[j][0])][1]
+                    else:
+                        question = answers[j][2]
+                    answer = answers[j][3]
+                    mood = answers[j][4]
+                    break
+
+            self.ids[day.day].ids.question.text = question
+            if mood == '':
+                self.ids[day.day].ids.mood.source = 'images/moods/normal.png'
+                self.ids[day.day].ids.mood.color = (1, 1, 1, 0)
+            else:
+                self.ids[day.day].ids.mood.source = 'images/moods/' + mood + '.png'
+                self.ids[day.day].ids.mood.color = (1, 1, 1, 1)
+
+            if day != self.today and (question == '' or (answer == '' and mood == '')):
+                self.ids[day.day].ids.select_btn.disabled = True
+            else:
+                self.ids[day.day].ids.select_btn.disabled = False
+            # Move to QnA Screen if select date is today
+            if day == self.today:
+                self.ids[day.day].canvas_opacity_border = 1
+                # self.ids[day.day].ids.select_btn.bind(
+                #    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
+            else:
+                self.ids[day.day].canvas_opacity_border = 0
+                # self.ids[day.day].ids.select_btn.bind(
+                #    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
+
+            self.ids[day.day].canvas_opacity_line = 1
+            self.ids[day.day].canvas_opacity_button = 0.4
 
     def update_data(self, today_ques, today_mood):
         App.get_running_app().root.get_screen('history').change_month('now')
@@ -468,7 +488,7 @@ class QuestionHistory(Screen):
                     break
                 else:
                     filled += 1
-        print(last_dates[0])
+        # print(last_dates[0])
         for j in range(5):
             if last_dates[j] != '':
                 self.ids[str(j)].ids.date.text = '{month}-{day}'.format(month=last_dates[j][5:7],
@@ -630,6 +650,7 @@ class SettingWindow(Screen):
             with open('setting.csv', 'w', newline='') as file:
                 setting = csv.writer(file)
                 setting.writerow(['english', settings[1], settings[2]])
+
 
 
 class RunApp(App):

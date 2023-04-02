@@ -75,6 +75,7 @@ WindowManager:
                 text: 'Setting' if app.language == 'english' else '설정'
                 font_name: 'fonts/vintage2.otf' if app.language == 'english' else 'fonts/korean4'
                 font_size: '40dp'
+                italic: True
                 on_release:
                     app.root.current = 'setting'
                     root.manager.transition.direction = 'left'
@@ -495,6 +496,7 @@ WindowManager:
                         size: self.size
                         pos: self.pos
                         radius: [15]
+                on_release:
 
 
 
@@ -582,7 +584,7 @@ WindowManager:
     SelectButton:
         id: select_btn
         on_release:
-            #app.root.current = 'qna_history'
+            app.root.current = root.screen_switch_setting(root.canvas_opacity_border)
             app.root.get_screen('qna').previous_screen = 'history'
             app.root.get_screen('qna_history').manager.transition.direction = 'left'
             app.root.get_screen('qna_history').access_history(root.ids.date.text, root.ids.year_saver.text)
