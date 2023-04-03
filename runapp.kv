@@ -6,7 +6,6 @@ WindowManager:
     QuestionHistory:
     QnAHistoryWindow:
     SettingWindow:
-#QnAWindow:
 
 
 <MainWindow>:
@@ -65,7 +64,7 @@ WindowManager:
             OptionButton:
                 text: 'History' if app.language == 'english' else '내역'
                 font_name: 'fonts/vintage2.otf' if app.language == 'english' else 'fonts/korean4'
-                font_size: '40dp'
+                font_size: '40dp' if app.language == 'english' else '30dp'
                 on_release:
                     app.root.current = 'history'
                     root.manager.transition.direction = 'left'
@@ -74,7 +73,7 @@ WindowManager:
             OptionButton:
                 text: 'Setting' if app.language == 'english' else '설정'
                 font_name: 'fonts/vintage2.otf' if app.language == 'english' else 'fonts/korean4'
-                font_size: '40dp'
+                font_size: '40dp' if app.language == 'english' else '30dp'
                 italic: True
                 on_release:
                     app.root.current = 'setting'
@@ -124,10 +123,12 @@ WindowManager:
             font_name: 'fonts/korean1.ttf'
             text: root.question
             text_size: self.size
+            padding_x: 20
             halign: 'left'
             valign: 'middle'
             font_size: dp(17)
-            size_hint: (0.75, 0.08)
+            #size_hint: (0.75, 0.08)
+            size_hint: (len(self.text)/26, 0.08) if len(self.text) <= 19 else (0.75, 0.08)
             color: (0, 0, 0)
         AnswerChatBox:
             id:answer
@@ -135,12 +136,13 @@ WindowManager:
             #pos_hint: {'center_x': 0.55, 'center_y': 0.75}
             pos_hint: {'right': 0.95, 'center_y': 0.7}
             text: root.answer
+            padding_x: 20
             text_size: self.size
             font_name: 'fonts/korean1.ttf'
             halign: 'left'
             valign: 'middle'
             font_size: dp(17)
-            size_hint: (0, 0) if root.answer == '' else (0.75,0.05)
+            size_hint: root.get_answerbox_size()
             color: (0, 0, 0)
         TypeBox:
             id: typebox
@@ -214,23 +216,27 @@ WindowManager:
             pos_hint: {'x': 0.05, 'center_y': 0.9}
             font_name: 'fonts/korean1.ttf'
             #text: root.question
+            padding_x: 20
             text_size: self.size
             halign: 'left'
             valign: 'middle'
             font_size: dp(17)
-            size_hint: (0.75, 0.08) if root.width < root.height else (0.3, 0.08)
+            #size_hint: (0.75, 0.08)
+            size_hint: (len(self.text)/26, 0.08) if len(self.text) <= 19 else (0.75, 0.08)
             color: (0, 0, 0)
         AnswerChatBox:
             id:last_answer
             padding: (10, 0)
             pos_hint: {'right': 0.95, 'center_y': 0.7}
             #text: root.answer
+            padding_x: 20
             text_size: self.size
             font_name: 'fonts/korean1.ttf'
             halign: 'left'
             valign: 'middle'
             font_size: dp(17)
-            size_hint: (0.75, 0.05)
+            #size_hint: (0.75, 0.08)
+            size_hint: (0.3, 0.08) if len(self.text) == 0 else (len(self.text)/28, 0.08) if len(self.text) <= 19 else (0.75, 0.08)
             color: (0, 0, 0)
         Button:
             text: '>> This question history <<' if app.language == 'english' else '>> 이 질문 내역 <<'
@@ -400,6 +406,8 @@ WindowManager:
             allow_stretch: True
             keep_ratio: False
             color: (1,1,1,0.5)
+        SettingPopup:
+            id: setting_popup
         BoxLayout:
             orientation: 'vertical'
             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
@@ -438,7 +446,11 @@ WindowManager:
                         state:'down' if root.language == 'english' else 'normal'
                             #'down' if app.language == 'english' else 'normal'
                             #'normal' if root.ids.kor_btn.state == 'down' else 'down'
-                        on_state: root.eng_setting(self)
+                        on_state:
+                            root.eng_setting(self)
+                            root.ids.setting_popup.show_popup_eng(self)
+                        #on_release: root.ids.setting_popup.show_popup_eng(self)
+
                     LanguageButton:
                         id: kor_btn
                         #group: 'lang_btn'
@@ -446,7 +458,10 @@ WindowManager:
                         state: 'down' if root.language == 'korean' else 'normal'
                             #'normal' if root.ids.eng_btn.state == 'down' else 'down'
                             #'down' if app.language == 'korean' else 'normal'
-                        on_state: root.kor_setting(self)
+                        on_state:
+                            root.kor_setting(self)
+                            root.ids.setting_popup.show_popup_kor(self)
+                        #on_release: root.ids.setting_popup.show_popup_kor(self)
                 Label:
                     text: 'Background Music:' if app.language == 'english' else '배경 음악:'
                     font_name: 'fonts/korean2'
@@ -496,7 +511,7 @@ WindowManager:
                         size: self.size
                         pos: self.pos
                         radius: [15]
-                on_release: app.restart()
+                #on_release: Factory.SettingPopup().open()
 
 
 
@@ -759,11 +774,11 @@ WindowManager:
                 text_size: self.size
                 halign: 'center'
                 valign: 'top'
-
         Label:
             id: answer
             font_name: 'fonts/korean1.ttf'
             text_size: self.size
+            font_size: dp(15) if len(self.text) <= 300 and self.text.count('\n') <= 8 else dp(11)
             halign: 'left'
             valign: 'middle'
             padding_x: dp(10)
@@ -792,4 +807,50 @@ WindowManager:
             pos: self.pos
             radius: [20]
 
-<SettingPopup@Popup>:
+<SettingPopup>:
+    background_color: (0,0,0,0)
+    size_hint: (0.8, 0.075)
+    pos_hint: {'center_x': 0.5, 'center_y': 0.86}
+    RelativeLayout:
+        Label:
+            id: popup_eng
+            background_color: (0,0,0,0)
+            multiline: True
+            color: (0,0,0,0)
+            text: 'Please restart app to apply language change'
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+            font_name: 'fonts/korean1.ttf'
+            font_size: dp(15)
+            padding_x: 10
+            canvas.before:
+                Color:
+                    rgba: (1, 1, 1, root.popup_opacity_eng)
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [20,20,20,20]
+                Color:
+                    rgba: (1, 1, 1, 1)
+        Label:
+            id: popup_kor
+            background_color: (0,0,0,0)
+            multiline: True
+            color: (0,0,0,0)
+            text: '언어 변경을 적용하려면 앱을 재시작하십시오'
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+            font_name: 'fonts/korean1.ttf'
+            font_size: dp(16)
+            padding_x: 10
+            canvas.before:
+                Color:
+                    rgba: (1, 1, 1, root.popup_opacity_kor)
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [20,20,20,20]
+                Color:
+                    rgba: (1, 1, 1, 1)

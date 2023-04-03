@@ -1,10 +1,6 @@
 from calendar import monthrange
 from datetime import date, datetime, timedelta
 
-# import kivy
-# import pandas as pd
-# import numpy as np
-import os, sys
 import random
 import csv
 from kivy import Config
@@ -12,9 +8,11 @@ from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
+from kivy.lang import Builder
 # from kivy.core.window import Window
 from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.popup import Popup
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 
@@ -402,10 +400,29 @@ class QnAWindow(Screen):
         else:
             self.mood = 'happy'
 
+    def get_answerbox_size(self):
+        break_line_count = self.answer.count('\n')
+        print(0.08 + 0.01 * (int(len(self.answer) / 20) + break_line_count))
+        if len(self.answer) <= 3:
+            return (0.2, 0.015 * break_line_count + 0.06)
+        elif len(self.answer) <= 19:
+            return (len(self.answer) / 28, 0.015 * break_line_count + 0.06)
+        else:
+            return (0.75, 0.06 + 0.015 * (int(len(self.answer)/20) + break_line_count))
+
     def set_answer(self, ans):
         self.answer = ans
         self.ids.answer.text = self.answer
-        self.ids.answer.size_hint = (0.75, 0.05)
+        break_line_count = self.answer.count('\n')
+        print(len(self.answer),':' ,self.answer)
+        print('height: ', 0.015 * break_line_count + 0.06)
+        if len(ans) <= 3:
+            self.ids.answer.size_hint = (0.2, 0.015 * break_line_count + 0.06)
+        elif len(ans) <= 19:
+            self.ids.answer.size_hint = (len(ans) / 28, 0.015 * break_line_count + 0.06)
+        else:
+            self.ids.answer.size_hint = (0.75, 0.06 + 0.015 * (int(len(ans)/20) + break_line_count))
+
 
         answers = []
         with open('user/answers_list.csv', 'r') as file:
@@ -548,6 +565,9 @@ class QnAHistoryWindow(Screen):
             self.ids.last_mood.color = (1, 1, 1, 1)
             self.ids.last_mood_slider.value_track_color = [0.8, 0.1, 0.9, 0.4]
 
+        print(len(question))
+        print(question)
+
 
 class SettingWindow(Screen):
     settings = None
@@ -652,6 +672,31 @@ class SettingWindow(Screen):
                 setting.writerow(['english', settings[1], settings[2]])
 
 
+class SettingPopup(RelativeLayout):
+    popup_opacity_eng = NumericProperty(0, rebind=True)
+    popup_opacity_kor = NumericProperty(0, rebind=True)
+
+    def show_popup_eng(self, btn):
+        if btn.state == 'down':
+            self.ids.popup_eng.color = (0, 0, 0, 1)
+            self.popup_opacity_eng = 0.3
+            Clock.schedule_once(self.hide_popup_eng, 2.5)
+
+    def hide_popup_eng(self, dt):
+        self.ids.popup_eng.color = (0, 0, 0, 0)
+        self.popup_opacity_eng = 0
+
+    def show_popup_kor(self, btn):
+        if btn.state == 'down':
+            self.ids.popup_kor.color = (0, 0, 0, 1)
+            self.popup_opacity_kor = 0.3
+            Clock.schedule_once(self.hide_popup_kor, 2.5)
+
+    def hide_popup_kor(self, dt):
+        self.ids.popup_kor.color = (0, 0, 0, 0)
+        self.popup_opacity_kor = 0
+
+
 class RunApp(App):
     settings = None
     with open('setting.csv', 'r', newline='') as file:
@@ -676,12 +721,6 @@ class RunApp(App):
     click.volume = 0.5 * sound
 
     background_music.play()
-
-    @staticmethod
-    def restart():
-        print(f'exec:{sys.executable} {["python"] + sys.argv}')
-        os.execvp(sys.executable, ['python'] + sys.argv)
-        #self.root.clear_widgets()
 
 
 runApp = RunApp()
