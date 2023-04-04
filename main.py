@@ -3,6 +3,8 @@ from datetime import date, datetime, timedelta
 
 import random
 import csv
+
+#from kivy import Config
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
@@ -729,7 +731,7 @@ class RunApp(App):
         if self.init_pos_y < 0.575 or self.init_pos_y > 0.6:
             self.delta_pos_y = -self.delta_pos_y
 
-        if self.tap_here_opacity > 1 or self.tap_here_opacity < 0.3:
+        if self.tap_here_opacity > 1 or self.tap_here_opacity < 0.1:
             self.delta_opa = -self.delta_opa
 
         self.tap_here_opacity += self.delta_opa
