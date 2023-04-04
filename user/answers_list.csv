@@ -44,13 +44,11 @@ id,date,question,answer,mood,mood_value
 94,2023-04-03,오늘 하루 즐거웠는가?,"a
 b
 c",positive,157
-27,2023-04-04,"Which art movement best describes you today? (Surrealism, Modernism or Dadaism)","klsadhjsa aslkdj sakldj asdk lasjdkl sadsa lkdsaj dsakd asd askjd hjas hdjas hjas asjdh sajd asj safasdfasdfads ads fasdf asd dsafa dsf asdf adsf ads sdaf asdf asdf  asdf asdf asdfsd fa sdf asdds asdfa dsf asdf asdf dsf asdf asd
-ds adsf sdf sdaf 
-
-sadfa sdf\asdf
-asdf asd
-s
-s",sad,35
+27,2023-04-04,"Which art movement best describes you today? (Surrealism, Modernism or Dadaism)","1
+2
+3
+4asdas\as
+das",positive,151
 313,2023-04-05,What topic are you bored talking about?,"i don't know what is he but i will try to do my bext
 1. do things 2
 2. do thing b",,100

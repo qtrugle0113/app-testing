@@ -37,13 +37,6 @@ def today_question():
     # language mode: 2 for english, 1 for korean
     lang_mode = 2 if settings[0] == 'english' else 1
 
-    """questions = []
-    # load questions list
-    with open('data/questions_list.csv', 'r') as file:
-        questions_list = csv.reader(file)
-        for row in questions_list:
-            questions.append(row)"""
-
     # if already created, reload question data
     answers = []
     with open('user/answers_list.csv', 'r') as file:
@@ -431,7 +424,6 @@ class QnAWindow(Screen):
         else:
             self.ids.answer.size_hint = (0.8, 0.025 * (int(len(self.answer) / 30) + break_line_count) + 0.06)
 
-
         answers = []
         with open('user/answers_list.csv', 'r') as file:
             answers_list = csv.reader(file)
@@ -740,6 +732,26 @@ class RunApp(App):
     click.volume = 0.5 * sound
 
     background_music.play()
+
+    init_pos_y = 0.6
+    delta_pos_y = 0.0002
+    delta_opa = 0.01
+    tap_here_opacity = NumericProperty(0.3, rebind=True)
+
+    def build(self):
+        App.get_running_app().root.get_screen('main').ids.logo.pos_hint = {'center_x': 0.5, 'center_y': self.init_pos_y}
+        Clock.schedule_interval(self.animate_logo, 1.0 / 60.0)
+
+    def animate_logo(self, dt):
+        if self.init_pos_y < 0.575 or self.init_pos_y > 0.6:
+            self.delta_pos_y = -self.delta_pos_y
+
+        if self.tap_here_opacity > 1 or self.tap_here_opacity < 0.3:
+            self.delta_opa = -self.delta_opa
+
+        self.tap_here_opacity += self.delta_opa
+        self.init_pos_y -= self.delta_pos_y
+        App.get_running_app().root.get_screen('main').ids.logo.pos_hint = {'center_x': 0.5, 'center_y': self.init_pos_y}
 
 
 runApp = RunApp()
