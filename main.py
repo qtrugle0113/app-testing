@@ -3,21 +3,16 @@ from datetime import date, datetime, timedelta
 
 import random
 import csv
-from kivy import Config
-from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
-from kivy.lang import Builder
-# from kivy.core.window import Window
 from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.popup import Popup
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 
-Config.set('graphics', 'width', '450')
-Config.set('graphics', 'height', '1000')
+#Config.set('graphics', 'width', '450')
+#Config.set('graphics', 'height', '1000')
 from kivy.core.window import Window
 
 questions = []
@@ -146,8 +141,6 @@ class HistoryWindow(Screen):
     day = today.day
     days_in_month = monthrange(year, month)[1]
     today_text = None
-    # set position for the scroll calendar box: 1 is top, 0 is bottom
-    # scroll_view_pos = 1 - day/days_in_month
     scroll_view_pos = 1
 
     months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
@@ -191,7 +184,6 @@ class HistoryWindow(Screen):
         self.ids.calendar_box.height = 250 * self.days_in_month
         self.ids.calendar_box.change_calendar(self.month, self.year)
         self.ids.scroll_box.scroll_y = 1
-        # print(self.month, self.year)
 
 
 class SelectDayLayout(RelativeLayout):
@@ -230,7 +222,6 @@ class CalendarBox(GridLayout):
                 b.canvas_opacity_line = 0
                 self.add_widget(b)
                 continue
-            # day = self.today.replace(day=1) + timedelta(days=i)
             b = SelectDayLayout()
             # self.ids[day] = b
             self.ids[day.day] = b
@@ -277,15 +268,11 @@ class CalendarBox(GridLayout):
             # Move to QnA Screen if select date is today
             if day == self.today:
                 b.canvas_opacity_border = 1
-                # b.ids.select_btn.bind(on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
             else:
                 b.canvas_opacity_border = 0
-                # b.ids.select_btn.bind(
-                #    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
 
     def change_calendar(self, new_month, new_year):
         for i in range(31):
-            # for i in range(monthrange(new_year, new_month)[1]):
             day = self.today.replace(year=new_year, month=new_month, day=1) + timedelta(days=i)
             weekday_idx = (monthrange(new_year, new_month)[0] + i) % 7
 
@@ -347,12 +334,8 @@ class CalendarBox(GridLayout):
             # Move to QnA Screen if select date is today
             if day == self.today:
                 self.ids[day.day].canvas_opacity_border = 1
-                # self.ids[day.day].ids.select_btn.bind(
-                #    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna'))
             else:
                 self.ids[day.day].canvas_opacity_border = 0
-                # self.ids[day.day].ids.select_btn.bind(
-                #    on_release=lambda *args: setattr(App.get_running_app().root, 'current', 'qna_history'))
 
             self.ids[day.day].canvas_opacity_line = 1
             self.ids[day.day].canvas_opacity_button = 0.4
