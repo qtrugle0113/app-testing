@@ -33,7 +33,7 @@ jobs:
         id: buildozer
         with:
           command: buildozer android release
-          buildozer_version: master
+          buildozer_version: develop
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
