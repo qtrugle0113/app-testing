@@ -482,7 +482,9 @@ WindowManager:
             font_size: dp(18) if self.state == 'normal' else dp(20)
             background_color: (0,0,0,0)
             background_normal: ''
-            on_release: Factory.Credit().open()
+            on_release:
+                app.click.play()
+                Factory.Credit().open()
 
 
 <OptionButton@Button>:
@@ -845,7 +847,7 @@ WindowManager:
             text:
                 'Inspired by the book "Q&A a Day: 5-Year Journal" by Potter Gift\n\n' + \
                 '--------\nMusic and effect sounds by SergeQuadrado, UNIVERSFIELD from Pixabay\n\n' + \
-                '--------\nImages by Pete Linforth, Wilson Joseph and  Albert-Paul from Pixabay\n\n' + \
+                '--------\nImages by Pete Linforth, Wilson Joseph and Albert-Paul from Pixabay\n\n' + \
                 '--------\nDesigned and developed by LE QUANG TRUNG\n\n' + \
                 'Contact: rikateamovt1@gmail.com'
             canvas.before:
@@ -872,5 +874,7 @@ WindowManager:
                         size: self.size
                         pos: self.pos
                         radius: [20,20,20,20]
-                on_release: root.dismiss()
+                on_release:
+                    app.click.play()
+                    root.dismiss()
 
