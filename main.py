@@ -402,26 +402,34 @@ class QnAWindow(Screen):
 
     def get_answerbox_size(self):
         break_line_count = self.answer.count('\n')
-        print(0.08 + 0.01 * (int(len(self.answer) / 20) + break_line_count))
-        if len(self.answer) <= 3:
-            return (0.2, 0.015 * break_line_count + 0.06)
-        elif len(self.answer) <= 19:
-            return (len(self.answer) / 28, 0.015 * break_line_count + 0.06)
+        if len(self.answer) == 0:
+            return (0, 0)
+        elif len(self.answer) <= 3:
+            return (0.2, 0.025 * break_line_count + 0.06)
+        elif len(self.answer) <= 10:
+            return (0.45, 0.025 * break_line_count + 0.06)
+        elif len(self.answer) <= 20:
+            return (0.65, 0.025 * break_line_count + 0.06)
+        elif App.get_running_app().language == 'english':
+            return (0.8, 0.025 * (int(len(self.answer) / 40) + break_line_count) + 0.06)
         else:
-            return (0.75, 0.06 + 0.015 * (int(len(self.answer)/20) + break_line_count))
+            return (0.8, 0.025 * (int(len(self.answer) / 30) + break_line_count) + 0.06)
 
     def set_answer(self, ans):
         self.answer = ans
         self.ids.answer.text = self.answer
         break_line_count = self.answer.count('\n')
-        print(len(self.answer),':' ,self.answer)
-        print('height: ', 0.015 * break_line_count + 0.06)
-        if len(ans) <= 3:
-            self.ids.answer.size_hint = (0.2, 0.015 * break_line_count + 0.06)
-        elif len(ans) <= 19:
-            self.ids.answer.size_hint = (len(ans) / 28, 0.015 * break_line_count + 0.06)
+
+        if len(self.answer) <= 3:
+            self.ids.answer.size_hint = (0.2, 0.025 * break_line_count + 0.06)
+        elif len(self.answer) <= 10:
+            self.ids.answer.size_hint = (0.45, 0.025 * break_line_count + 0.06)
+        elif len(self.answer) <= 20:
+            self.ids.answer.size_hint = (0.65, 0.025 * break_line_count + 0.06)
+        elif App.get_running_app().language == 'english':
+            self.ids.answer.size_hint = (0.8, 0.025 * (int(len(self.answer) / 40) + break_line_count) + 0.06)
         else:
-            self.ids.answer.size_hint = (0.75, 0.06 + 0.015 * (int(len(ans)/20) + break_line_count))
+            self.ids.answer.size_hint = (0.8, 0.025 * (int(len(self.answer) / 30) + break_line_count) + 0.06)
 
 
         answers = []
@@ -524,6 +532,7 @@ class QuestionHistory(Screen):
                 self.ids[str(j)].ids.mood.color = (1, 1, 1, 0)
             else:
                 self.ids[str(j)].ids.mood.source = 'images/moods/' + last_moods[j] + '.png'
+                self.ids[str(j)].ids.mood.color = (1, 1, 1, 1)
 
 
 class QnAHistoryWindow(Screen):
@@ -565,8 +574,18 @@ class QnAHistoryWindow(Screen):
             self.ids.last_mood.color = (1, 1, 1, 1)
             self.ids.last_mood_slider.value_track_color = [0.8, 0.1, 0.9, 0.4]
 
-        print(len(question))
-        print(question)
+    def get_answerbox_size(self, answer):
+        break_line_count = answer.count('\n')
+        if len(answer) <= 3:
+            return (0.2, 0.025 * break_line_count + 0.06)
+        elif len(answer) <= 10:
+            return (0.45, 0.025 * break_line_count + 0.06)
+        elif len(answer) <= 20:
+            return (0.65, 0.025 * break_line_count + 0.06)
+        elif App.get_running_app().language == 'english':
+            return (0.8, 0.025 * (int(len(answer) / 40) + break_line_count) + 0.06)
+        else:
+            return (0.8, 0.025 * (int(len(answer) / 30) + break_line_count) + 0.06)
 
 
 class SettingWindow(Screen):

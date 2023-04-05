@@ -110,9 +110,6 @@ WindowManager:
                 app.root.get_screen('history').ids.calendar_box.update_data(app.root.get_screen('qna').question, app.root.get_screen('qna').mood)
         Image:
             source: 'images/moods/normal.png' if root.mood == '' else 'images/moods/' + root.mood + '.png'
-            #size_hint: (None, None)
-            #width: dp(70)
-            #height: dp(70)
             pos_hint: {'center_x': 0.5, 'center_y': 0.175}
             color: (1,1,1,0) if root.mood == '' else (1,1,1,1)
 
@@ -123,25 +120,27 @@ WindowManager:
             font_name: 'fonts/korean1.ttf'
             text: root.question
             text_size: self.size
+            line_height: 1.25
             padding_x: 20
             halign: 'left'
             valign: 'middle'
             font_size: dp(17)
             #size_hint: (0.75, 0.08)
-            size_hint: (len(self.text)/26, 0.08) if len(self.text) <= 19 else (0.75, 0.08)
+            size_hint: (len(self.text)/26, 0.085) if len(self.text) <= 19 else (0.75, 0.085) if len(self.text) <= 80 else (0.75, 0.095)
             color: (0, 0, 0)
         AnswerChatBox:
             id:answer
-            padding: (10, 0)
             #pos_hint: {'center_x': 0.55, 'center_y': 0.75}
-            pos_hint: {'right': 0.95, 'center_y': 0.7}
+            pos_hint: {'right': 0.95, 'center_y': 0.7} if self.size_hint_y <= 0.25 else  {'right': 0.95, 'center_y': 0.65}
             text: root.answer
             padding_x: 20
+            line_height: 1.25
             text_size: self.size
             font_name: 'fonts/korean1.ttf'
             halign: 'left'
             valign: 'middle'
-            font_size: dp(17)
+            font_size:
+                dp(17) if (len(self.text) < 250 and app.language == 'korean') or (app.language == 'english') else dp(15)
             size_hint: root.get_answerbox_size()
             color: (0, 0, 0)
         TypeBox:
@@ -212,31 +211,31 @@ WindowManager:
             #color: (1,1,1,0) if root.mood == '' else (1,1,1,1)
         QuestionChatBox:
             id: last_question
-            padding: (10, 0)
             pos_hint: {'x': 0.05, 'center_y': 0.9}
             font_name: 'fonts/korean1.ttf'
             #text: root.question
             padding_x: 20
+            line_height: 1.25
             text_size: self.size
             halign: 'left'
             valign: 'middle'
             font_size: dp(17)
             #size_hint: (0.75, 0.08)
-            size_hint: (len(self.text)/26, 0.08) if len(self.text) <= 19 else (0.75, 0.08)
+            #size_hint: (len(self.text)/26, 0.08) if len(self.text) <= 19 else (0.75, 0.08)
+            size_hint: (len(self.text)/26, 0.085) if len(self.text) <= 19 else (0.75, 0.085) if len(self.text) <= 80 else (0.75, 0.095)
             color: (0, 0, 0)
         AnswerChatBox:
             id:last_answer
-            padding: (10, 0)
-            pos_hint: {'right': 0.95, 'center_y': 0.7}
-            #text: root.answer
+            #pos_hint: {'right': 0.95, 'center_y': 0.7}
+            pos_hint: {'right': 0.95, 'center_y': 0.7} if self.size_hint_y <= 0.25 else  {'right': 0.95, 'center_y': 0.6}
             padding_x: 20
+            line_height: 1.25
             text_size: self.size
             font_name: 'fonts/korean1.ttf'
             halign: 'left'
             valign: 'middle'
-            font_size: dp(17)
-            #size_hint: (0.75, 0.08)
-            size_hint: (0.3, 0.08) if len(self.text) == 0 else (len(self.text)/28, 0.08) if len(self.text) <= 19 else (0.75, 0.08)
+            font_size: dp(17) if (len(self.text) < 250 and app.language == 'korean') or (app.language == 'english') else dp(15)
+            size_hint: root.get_answerbox_size(self.text)
             color: (0, 0, 0)
         Button:
             text: '>> This question history <<' if app.language == 'english' else '>> 이 질문 내역 <<'
@@ -778,7 +777,9 @@ WindowManager:
             id: answer
             font_name: 'fonts/korean1.ttf'
             text_size: self.size
-            font_size: dp(15) if len(self.text) <= 300 and self.text.count('\n') <= 8 else dp(11)
+            font_size:
+                dp(15) if (app.language == 'english' and len(self.text) <= 200 and self.text.count('\n') < 7) or \
+                (app.language == 'korean' and len(self.text) <= 120 and self.text.count('\n') < 7) else dp(11)
             halign: 'left'
             valign: 'middle'
             padding_x: dp(10)
