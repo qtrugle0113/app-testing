@@ -340,7 +340,7 @@ WindowManager:
                     font_size: dp(18)
                     color: (0, 0, 0, 1)
                     text_size: self.size
-                    halign: 'left'
+                    halign: 'center'
                     valign: 'middle'
                     padding_x: 15
                     size_hint: (0.9, 0.7)
@@ -826,7 +826,7 @@ WindowManager:
 <Credit@Popup>:
     size_hint: (0.85, 0.8)
     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-    auto_dismiss: True
+    auto_dismiss: False
     background_color: (0,0,0,0)
     title_size: 0
     tittle: ''
@@ -877,4 +877,3 @@ WindowManager:
                 on_release:
                     app.click.play()
                     root.dismiss()
-
