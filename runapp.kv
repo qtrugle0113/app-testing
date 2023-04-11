@@ -126,7 +126,7 @@ WindowManager:
             color: (0, 0, 0)
         AnswerChatBox:
             id:answer
-            pos_hint: {'right': 0.95, 'center_y': 0.7} if self.size_hint_y <= 0.25 else  {'right': 0.95, 'center_y': 0.65}
+            pos_hint: {'right': 0.95, 'center_y': 0.75} if self.size_hint_y <= 0.25 else  {'right': 0.95, 'center_y': 0.65}
             text: root.answer
             padding_x: 20
             line_height: 1.25
@@ -137,6 +137,21 @@ WindowManager:
             font_size:
                 dp(17) if (len(self.text) < 250 and app.language == 'korean') or (app.language == 'english') else dp(15)
             size_hint: root.get_answerbox_size()
+            color: (0, 0, 0)
+        QuestionChatBox:
+            id: res
+            padding: (10, 0)
+            pos_hint: {'x': 0.05, 'center_y': 0.55}
+            font_name: 'fonts/korean1.ttf'
+            #text: 'root.question'
+            text_size: self.size
+            line_height: 1.25
+            padding_x: 20
+            halign: 'left'
+            valign: 'middle'
+            font_size: dp(17)
+            #size_hint: (len(self.text)/26, 0.085) if len(self.text) <= 19 else (0.75, 0.085) if len(self.text) <= 80 else (0.75, 0.095)
+            size_hint: (0.8, 0.2)
             color: (0, 0, 0)
         TypeBox:
             id: typebox
@@ -690,6 +705,7 @@ WindowManager:
                     app.click.play()
                     app.root.get_screen('qna').is_popup_open = False
                     app.root.get_screen('qna').set_answer(answer_text.text)
+                    #app.root.get_screen('qna').create_response(answer_text.text)
                     app.root.get_screen('history').ids.calendar_box.update_data(app.root.get_screen('qna').question, app.root.get_screen('qna').mood)
 
 <PopupButton@Button>:
