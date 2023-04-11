@@ -13,6 +13,7 @@ from qna_screen import *
 from history_screen import *
 from qna_history_screen import *
 from setting_screen import *
+import openai
 # import code from another py files: end
 
 
