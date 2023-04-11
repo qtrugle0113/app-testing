@@ -5,10 +5,6 @@ import random
 from kivy.app import App
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import Screen
-import openai
-
-openai_key = "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"
-openai.api_key = openai_key
 
 questions = []
 # load questions list
@@ -159,19 +155,6 @@ class QnAWindow(Screen):
                 answers_list.writerow(
                     [self.ques_id, str(self.today), self.question, self.answer, self.mood, int(self.mood_value)])
 
-        # create response
-        response = openai.ChatCompletion.create(
-            model='gpt-3.5-turbo',
-            messages=[{"role": "user", "content": ans}],
-            temperature=0,
-            max_tokens=2000,
-            top_p=1,
-            frequency_penalty=0.0,
-            presence_penalty=0.0
-        )
-        res = response.choices[0].message.content
-        App.get_running_app().root.get_screen('qna').ids.res.text = res
-
     # save answer when user choose mood on mood slider
     def save_answer(self, touch, widget):
         if touch.grab_current == widget:
@@ -198,6 +181,3 @@ class QnAWindow(Screen):
                     answers_list = csv.writer(file)
                     answers_list.writerow(
                         [self.ques_id, str(self.today), self.question, self.answer, self.mood, int(self.mood_value)])
-
-
-
